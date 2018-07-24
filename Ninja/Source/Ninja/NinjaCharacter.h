@@ -13,7 +13,7 @@ class NINJA_API ANinjaCharacter : public ACharacter
 
 public:
 	// Sets default values for this character's properties
-	ANinjaCharacter();
+	ANinjaCharacter(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	// Called when the game starts or when spawned

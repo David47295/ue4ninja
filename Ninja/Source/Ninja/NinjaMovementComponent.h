@@ -14,7 +14,8 @@ class NINJA_API UNinjaMovementComponent : public UCharacterMovementComponent
 {
 	GENERATED_BODY()
 	
-	
+public:
+	virtual bool DoJump(bool bReplayingMoves) override;
 	
 	
 };
