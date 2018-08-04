@@ -6,6 +6,9 @@
 #include "GameFramework/Character.h"
 #include "NinjaCharacter.generated.h"
 
+class UCameraComponent;
+class USpringArmComponent;
+
 UCLASS()
 class NINJA_API ANinjaCharacter : public ACharacter
 {
@@ -21,6 +24,10 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "NinjaMovement")
 		virtual void MoveRight(float Value);
+
+	UCameraComponent* MainCamera;
+
+	USpringArmComponent* CameraBoom;
 
 public:	
 	// Called every frame
