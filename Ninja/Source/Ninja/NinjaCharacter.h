@@ -10,6 +10,7 @@
 class UCameraComponent;
 class USpringArmComponent;
 class UBoxComponent;
+class UPaperFlipbookComponent;
 
 UCLASS()
 class NINJA_API ANinjaCharacter : public ACharacter
@@ -36,6 +37,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ninja Attacking")
 		FVector AttackHitboxLocation = FVector(0.f, 80.f, 30.f);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ninja Sprite")
+		UPaperFlipbookComponent* Sprite;
 
 	virtual void Attack();
 
