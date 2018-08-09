@@ -4,6 +4,7 @@
 #include "NinjaMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Components/BoxComponent.h"
 
 #define CAMERA_ARM_LENGTH 500.f
 
@@ -17,6 +18,10 @@ ANinjaCharacter::ANinjaCharacter(const FObjectInitializer& ObjectInitializer)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	CameraBoom->TargetArmLength = CAMERA_ARM_LENGTH;
+	AttackHitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("AttackHitbox"));
+	AttackHitbox->RelativeLocation = AttackHitboxLocation;
+	//AttackHitbox->bHiddenInGame = false;
+	AttackHitbox->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	//CameraBoom->SetWorldRotation(FRotator(0.f, -180.f, 0.f));
 	//CameraBoom->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	MainCamera->AttachToComponent(CameraBoom, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
@@ -33,6 +38,7 @@ void ANinjaCharacter::BeginPlay()
 void ANinjaCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	SetAttackHitboxLocation();
 }
 
 // Called to bind functionality to input
@@ -44,4 +50,28 @@ void ANinjaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void ANinjaCharacter::MoveRight(float Value) {
 	AddMovementInput(GetActorRightVector(), Value);
+}
+
+
+
+void ANinjaCharacter::Attack() {
+
+}
+
+void ANinjaCharacter::SetAttackHitboxLocation()
+{
+	float right = GetInputAxisValue("MoveRight");
+	if (right != 0) {
+		// If player is looking right
+		if (right > 0) {
+			AttackHitbox->SetRelativeLocation(AttackHitboxLocation);
+		}
+		// if player is looking left
+		else {
+			FVector dir = AttackHitboxLocation;
+			dir.Y *= -1.f;
+			AttackHitbox->SetRelativeLocation(dir);
+		}
+	}
+
 }

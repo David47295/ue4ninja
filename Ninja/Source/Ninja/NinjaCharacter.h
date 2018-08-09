@@ -6,8 +6,10 @@
 #include "GameFramework/Character.h"
 #include "NinjaCharacter.generated.h"
 
+// Forward declarations
 class UCameraComponent;
 class USpringArmComponent;
+class UBoxComponent;
 
 UCLASS()
 class NINJA_API ANinjaCharacter : public ACharacter
@@ -28,6 +30,16 @@ protected:
 	UCameraComponent* MainCamera;
 
 	USpringArmComponent* CameraBoom;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ninja Attacking")
+		UBoxComponent* AttackHitbox;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ninja Attacking")
+		FVector AttackHitboxLocation = FVector(0.f, 80.f, 30.f);
+
+	virtual void Attack();
+
+	virtual void SetAttackHitboxLocation();
 
 public:	
 	// Called every frame
