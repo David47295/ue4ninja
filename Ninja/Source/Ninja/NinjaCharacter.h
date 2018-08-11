@@ -36,14 +36,26 @@ protected:
 		UBoxComponent* AttackHitbox;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ninja Attacking")
-		FVector AttackHitboxLocation = FVector(0.f, 80.f, 30.f);
+		FVector AttackHitboxLocation = FVector(0.f, -80.f, 30.f);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ninja Sprite")
 		UPaperFlipbookComponent* Sprite;
 
-	virtual void Attack();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ninja Attacking")
+		bool bIsAttacking;
+
+	UFUNCTION(BlueprintCallable, Category="Ninja Attacking")
+		virtual void Attack();
 
 	virtual void SetAttackHitboxLocation();
+
+	virtual void HandleAttack();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ninja Attacking")
+		int32 GrndAttackStartFrame;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ninja Attacking")
+		int32 GrndAttackEndFrame;
 
 public:	
 	// Called every frame
@@ -51,7 +63,5 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	
 	
 };

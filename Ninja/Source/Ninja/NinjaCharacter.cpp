@@ -6,6 +6,7 @@
 #include "PaperFlipbookComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/BoxComponent.h"
+#include "Engine/World.h"
 
 #define CAMERA_ARM_LENGTH 500.f
 
@@ -42,6 +43,9 @@ void ANinjaCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	SetAttackHitboxLocation();
+
+	HandleAttack();
+	
 }
 
 // Called to bind functionality to input
@@ -58,23 +62,46 @@ void ANinjaCharacter::MoveRight(float Value) {
 
 
 void ANinjaCharacter::Attack() {
-	AttackHitbox->ToggleActive();
+	bIsAttacking = true;
+	if (!(GetCharacterMovement()->IsFalling())) {
+		APlayerController* MyController = (APlayerController*)GetController();
+		if (MyController) { DisableInput(MyController); }
+	}
 }
 
 void ANinjaCharacter::SetAttackHitboxLocation()
 {
 	float right = GetInputAxisValue("MoveRight");
-	if (right != 0) {
-		// If player is looking right
+	if (right != 0 && !bIsAttacking) {
+		// If player is looking left
 		if (right > 0) {
-			AttackHitbox->SetRelativeLocation(AttackHitboxLocation);
-		}
-		// if player is looking left
-		else {
 			FVector dir = AttackHitboxLocation;
 			dir.Y *= -1.f;
 			AttackHitbox->SetRelativeLocation(dir);
+			
+		}
+		// if player is looking right
+		else {
+			AttackHitbox->SetRelativeLocation(AttackHitboxLocation);
 		}
 	}
 
 }
+
+void ANinjaCharacter::HandleAttack()
+{
+	if (bIsAttacking) {
+		int32 AnimLength = Sprite->GetFlipbookLengthInFrames();
+		int32 CurrFrame = Sprite->GetPlaybackPositionInFrames();
+		if (GrndAttackStartFrame <= CurrFrame && CurrFrame <= GrndAttackEndFrame) {
+			GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, FString::Printf(TEXT("Frame: %d"), CurrFrame));
+		}
+		else if (CurrFrame >= AnimLength - 1) {
+			GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, TEXT("Enabling input"));
+			APlayerController* MyController = (APlayerController*)GetController();
+			EnableInput(MyController);
+			bIsAttacking = false;
+		}
+	}
+}
+
