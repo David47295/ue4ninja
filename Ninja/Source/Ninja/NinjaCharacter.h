@@ -51,6 +51,8 @@ protected:
 
 	virtual void HandleAttack();
 
+	//virtual bool AttackConnected();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ninja Attacking")
 		int32 GrndAttackStartFrame;
 
