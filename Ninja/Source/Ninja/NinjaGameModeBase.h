@@ -14,7 +14,10 @@ class NINJA_API ANinjaGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 	
-	
-	
-	
+public:
+	ANinjaGameModeBase();
+
+private:
+	virtual void StartRound();
+
 };

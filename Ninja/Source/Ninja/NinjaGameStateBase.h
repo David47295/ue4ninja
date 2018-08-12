@@ -16,5 +16,4 @@ class NINJA_API ANinjaGameStateBase : public AGameStateBase
 	
 	
 	
-	
 };

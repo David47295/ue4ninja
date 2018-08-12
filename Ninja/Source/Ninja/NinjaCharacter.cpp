@@ -92,30 +92,33 @@ void ANinjaCharacter::SetAttackHitboxLocation()
 void ANinjaCharacter::HandleAttack()
 {
 	if (bIsAttacking) {
-		int32 AnimLength = Sprite->GetFlipbookLengthInFrames();
-		int32 CurrFrame = Sprite->GetPlaybackPositionInFrames();
-		if (GrndAttackStartFrame <= CurrFrame && CurrFrame <= GrndAttackEndFrame) {
-			//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, FString::Printf(TEXT("Frame: %d"), CurrFrame));
-			TArray<AActor*> Actors = TArray<AActor*>();
-			AttackHitbox->GetOverlappingActors(Actors);
-			ANinjaCharacter* Target = (ANinjaCharacter*)Actors.GetData();
-			if (Target) {
-				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("HIT Frame: %d"), CurrFrame));
+		if (Sprite) {
+			int32 AnimLength = Sprite->GetFlipbookLengthInFrames();
+			int32 CurrFrame = Sprite->GetPlaybackPositionInFrames();
+			if (GrndAttackStartFrame <= CurrFrame && CurrFrame <= GrndAttackEndFrame) {
+				//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, FString::Printf(TEXT("Frame: %d"), CurrFrame));
+				TArray<AActor*> Actors = TArray<AActor*>();
+				AttackHitbox->GetOverlappingActors(Actors);
+				ANinjaCharacter* Target = (ANinjaCharacter*)Actors.GetData();
+				if (Target) {
+					GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("HIT Frame: %d"), CurrFrame));
 
+				}
+			}
+			else if (CurrFrame >= AnimLength - 1) {
+				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, TEXT("Enabling input"));
+				APlayerController* MyController = (APlayerController*)GetController();
+				if (MyController) {
+					EnableInput(MyController);
+				}
+				else {
+					GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, TEXT("Error"));
+				}
+				AttackHitbox->SetActive(false);
+				bIsAttacking = false;
 			}
 		}
-		else if (CurrFrame >= AnimLength - 1) {
-			GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, TEXT("Enabling input"));
-			APlayerController* MyController = (APlayerController*)GetController();
-			if (MyController) {
-				EnableInput(MyController);
-			}
-			else {
-				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, TEXT("Error"));
-			}
-			AttackHitbox->SetActive(false);
-			bIsAttacking = false;
 		}
-	}
+		
 }
 
