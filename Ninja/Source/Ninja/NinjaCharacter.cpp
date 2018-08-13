@@ -30,6 +30,13 @@ ANinjaCharacter::ANinjaCharacter(const FObjectInitializer& ObjectInitializer)
 	MainCamera->AttachToComponent(CameraBoom, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	Sprite = CreateDefaultSubobject<UPaperFlipbookComponent>(TEXT("Sprite"));
 	Sprite->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	Sprite->SetIsReplicated(true);
+}
+
+void ANinjaCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ANinjaCharacter, bIsMoving);
 }
 
 // Called when the game starts or when spawned
@@ -42,10 +49,10 @@ void ANinjaCharacter::BeginPlay()
 void ANinjaCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	SetSpriteRotation();
 	SetAttackHitboxLocation();
-
 	HandleAttack();
-	
+
 }
 
 // Called to bind functionality to input
@@ -69,6 +76,66 @@ void ANinjaCharacter::Attack() {
 		if (MyController) { DisableInput(MyController); }
 	}
 }
+
+void ANinjaCharacter::SetIsMoving(float Value)
+{
+	bIsMoving = Value != 0.f;
+
+	if (Role < ROLE_Authority) {
+		//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, TEXT("Running Server code"));
+		ServerSetIsMoving(Value);
+	}
+}
+
+void ANinjaCharacter::SetSpriteRotation()
+{
+	float right = GetInputAxisValue("MoveRight");
+	if (right > 0.f) {
+		Sprite->SetRelativeRotation(SpriteRightRot);
+	}
+	else if (right < 0.f) {
+		Sprite->SetRelativeRotation(SpriteLeftRot);
+	}
+
+	if (Role < ROLE_Authority) {
+		ServerSetSpriteRotation(right);
+	}
+}
+
+void ANinjaCharacter::ServerSetSpriteRotation_Implementation(float Value)
+{
+	//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("Value: %f"), Value));
+	if (Value > 0.f) {
+		Sprite->SetRelativeRotation(SpriteRightRot);
+	}
+	else if (Value < 0.f) {
+		Sprite->SetRelativeRotation(SpriteLeftRot);
+	}
+}
+
+bool ANinjaCharacter::ServerSetSpriteRotation_Validate(float Value)
+{
+	return (-1.f <= Value && Value <= 1.f);
+}
+
+void ANinjaCharacter::ServerSetIsMoving_Implementation(float Value)
+{
+	//if (Role == ROLE_Authority) {
+		//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("Value: %f"), Value));
+
+		SetIsMoving(Value);
+	//}
+	
+	//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("bIsMoving: %d"), bIsMoving));
+}
+
+bool ANinjaCharacter::ServerSetIsMoving_Validate(float Value)
+{
+	return (-1.f <= Value && Value <= 1.f);
+}
+
+
+
 
 void ANinjaCharacter::SetAttackHitboxLocation()
 {
@@ -118,7 +185,7 @@ void ANinjaCharacter::HandleAttack()
 				bIsAttacking = false;
 			}
 		}
-		}
+	}
 		
 }
 

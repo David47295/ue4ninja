@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "UnrealNetwork.h"
 #include "NinjaCharacter.generated.h"
 
 // Forward declarations
@@ -20,6 +21,8 @@ class NINJA_API ANinjaCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	ANinjaCharacter(const FObjectInitializer& ObjectInitializer);
+
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&OutLifetimeProps) const override;
 
 protected:
 	// Called when the game starts or when spawned
@@ -47,10 +50,23 @@ protected:
 	UFUNCTION(BlueprintCallable, Category="Ninja Attacking")
 		virtual void Attack();
 
+	UFUNCTION(BlueprintCallable, Category = "Ninja Movement")
+		virtual void SetIsMoving(float Value);
+
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "Ninja Movement")
+		virtual void ServerSetIsMoving(float Value);
+
+	virtual void SetSpriteRotation();
+
+	UFUNCTION(Server, unreliable, WithValidation, Category="Ninja Movement")
+		virtual void ServerSetSpriteRotation(float Value);
+
 	virtual void SetAttackHitboxLocation();
 
 	virtual void HandleAttack();
 
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category="Ninja Movement")
+		bool bIsMoving;
 	//virtual bool AttackConnected();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ninja Attacking")
@@ -59,6 +75,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ninja Attacking")
 		int32 GrndAttackEndFrame;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ninja Movement")
+		FRotator SpriteRightRot = FRotator(0.f, 90.f, 0.f);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ninja Movement")
+		FRotator SpriteLeftRot = FRotator(0.f, -90.f, 0.f);
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
