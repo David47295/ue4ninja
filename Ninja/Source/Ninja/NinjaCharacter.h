@@ -50,9 +50,13 @@ protected:
 	UFUNCTION(BlueprintCallable, Category="Ninja Attacking")
 		virtual void Attack();
 
+	/**
+	Set bIsMoving. Sets to true if Value != 0 and false otherwise
+	@param Value the MoveRight axis value of the controller
+	*/
 	UFUNCTION(BlueprintCallable, Category = "Ninja Movement")
 		virtual void SetIsMoving(float Value);
-
+	
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "Ninja Movement")
 		virtual void ServerSetIsMoving(float Value);
 
@@ -61,7 +65,10 @@ protected:
 	UFUNCTION(Server, unreliable, WithValidation, Category="Ninja Movement")
 		virtual void ServerSetSpriteRotation(float Value);
 
-	virtual void SetAttackHitboxLocation();
+	virtual void SetAttackHitboxLocation(float Value);
+
+	UFUNCTION(Server, unreliable, WithValidation, Category = "Ninja Attacking")
+		virtual void ServerSetAttackHitboxLocation(float Value);
 
 	virtual void HandleAttack();
 

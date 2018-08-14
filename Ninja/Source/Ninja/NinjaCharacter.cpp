@@ -48,9 +48,10 @@ void ANinjaCharacter::BeginPlay()
 // Called every frame
 void ANinjaCharacter::Tick(float DeltaTime)
 {
+	float right = GetInputAxisValue("MoveRight");
 	Super::Tick(DeltaTime);
 	SetSpriteRotation();
-	SetAttackHitboxLocation();
+	SetAttackHitboxLocation(right);
 	HandleAttack();
 
 }
@@ -135,14 +136,12 @@ bool ANinjaCharacter::ServerSetIsMoving_Validate(float Value)
 }
 
 
-
-
-void ANinjaCharacter::SetAttackHitboxLocation()
+void ANinjaCharacter::SetAttackHitboxLocation(float Value)
 {
-	float right = GetInputAxisValue("MoveRight");
-	if (right != 0 && !bIsAttacking) {
+	//float right = GetInputAxisValue("MoveRight");
+	if (Value != 0 && !bIsAttacking) {
 		// If player is looking left
-		if (right > 0) {
+		if (Value > 0) {
 			FVector dir = AttackHitboxLocation;
 			dir.Y *= -1.f;
 			AttackHitbox->SetRelativeLocation(dir);
@@ -153,7 +152,22 @@ void ANinjaCharacter::SetAttackHitboxLocation()
 			AttackHitbox->SetRelativeLocation(AttackHitboxLocation);
 		}
 	}
+	
+	if (Role < ROLE_Authority) {
+		ServerSetAttackHitboxLocation(Value);
+	}
 
+}
+
+void ANinjaCharacter::ServerSetAttackHitboxLocation_Implementation(float Value)
+{
+	//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("Value: %f"), Value));
+	SetAttackHitboxLocation(Value);
+}
+
+bool ANinjaCharacter::ServerSetAttackHitboxLocation_Validate (float Value)
+{
+	return (-1.f <= Value && Value <= 1.f);
 }
 
 void ANinjaCharacter::HandleAttack()
