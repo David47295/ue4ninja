@@ -54,6 +54,7 @@ void ANinjaCharacter::Tick(float DeltaTime)
 	SetAttackHitboxLocation(right);
 	HandleAttack();
 
+
 }
 
 // Called to bind functionality to input
@@ -138,7 +139,6 @@ bool ANinjaCharacter::ServerSetIsMoving_Validate(float Value)
 
 void ANinjaCharacter::SetAttackHitboxLocation(float Value)
 {
-	//float right = GetInputAxisValue("MoveRight");
 	if (Value != 0 && !bIsAttacking) {
 		// If player is looking left
 		if (Value > 0) {
@@ -161,7 +161,6 @@ void ANinjaCharacter::SetAttackHitboxLocation(float Value)
 
 void ANinjaCharacter::ServerSetAttackHitboxLocation_Implementation(float Value)
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("Value: %f"), Value));
 	SetAttackHitboxLocation(Value);
 }
 
