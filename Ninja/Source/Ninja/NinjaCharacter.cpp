@@ -81,26 +81,29 @@ void ANinjaCharacter::Attack() {
 
 void ANinjaCharacter::SetIsMoving(float Value)
 {
-	bIsMoving = Value != 0.f;
-
-	if (Role < ROLE_Authority) {
+	APlayerController* PC = (APlayerController*)GetController();
+	if (Role < ROLE_Authority && PC && PC->IsLocalController()) {
 		//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, TEXT("Running Server code"));
 		ServerSetIsMoving(Value);
 	}
+
+	bIsMoving = Value != 0.f;
 }
 
 void ANinjaCharacter::SetSpriteRotation()
 {
+	APlayerController* PC = (APlayerController*)GetController();
 	float right = GetInputAxisValue("MoveRight");
+
+	if (Role < ROLE_Authority && PC && PC->IsLocalController()) {
+		ServerSetSpriteRotation(right);
+	}
+
 	if (right > 0.f) {
 		Sprite->SetRelativeRotation(SpriteRightRot);
 	}
 	else if (right < 0.f) {
 		Sprite->SetRelativeRotation(SpriteLeftRot);
-	}
-
-	if (Role < ROLE_Authority) {
-		ServerSetSpriteRotation(right);
 	}
 }
 
@@ -139,6 +142,11 @@ bool ANinjaCharacter::ServerSetIsMoving_Validate(float Value)
 
 void ANinjaCharacter::SetAttackHitboxLocation(float Value)
 {
+	APlayerController* PC = (APlayerController*)GetController();
+	if (Role < ROLE_Authority && PC && PC->IsLocalController()) {
+		ServerSetAttackHitboxLocation(Value);
+	}
+
 	if (Value != 0 && !bIsAttacking) {
 		// If player is looking left
 		if (Value > 0) {
@@ -151,10 +159,6 @@ void ANinjaCharacter::SetAttackHitboxLocation(float Value)
 		else {
 			AttackHitbox->SetRelativeLocation(AttackHitboxLocation);
 		}
-	}
-	
-	if (Role < ROLE_Authority) {
-		ServerSetAttackHitboxLocation(Value);
 	}
 
 }

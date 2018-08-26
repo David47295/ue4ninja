@@ -21,31 +21,35 @@ void UNinjaMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVecto
 
 	if (!PawnOwner) { return; }
 
+	APlayerController* PC = (APlayerController*)PawnOwner->GetController();
+	if (PawnOwner->Role < ROLE_Authority && PC && PC->IsLocalController()) {
+		FVector MovementInput = PawnOwner->GetLastMovementInputVector();
+		ServerSetAirJumpDirection(MovementInput * 600.f + FVector(0.f, 0.f, 500.f));
+	}
+
 	if (PawnOwner->IsLocallyControlled()) {
 		FVector MovementInput = PawnOwner->GetLastMovementInputVector();
 		AirJumpDirection = MovementInput * 600.f + FVector(0.f, 0.f, 500.f);
 	}
 
-	if (PawnOwner->Role < ROLE_Authority) {
-		FVector MovementInput = PawnOwner->GetLastMovementInputVector();
-		ServerSetAirJumpDirection(MovementInput * 600.f + FVector(0.f, 0.f, 500.f));
-	}
-
 }
 
 void UNinjaMovementComponent::SetAirJumpDirection() {
+	
+	APlayerController* PC = (APlayerController*)PawnOwner->GetController();
+	if (PawnOwner->Role < ROLE_Authority && PC && PC->IsLocalController()) {
+		ServerSetAirJumpDirection(AirJumpDirection);
+	}
+
 	FVector MovementInput = PawnOwner->GetLastMovementInputVector();
 	AirJumpDirection = MovementInput * 600.f + FVector(0.f, 0.f, 500.f);
 
-	if (PawnOwner->Role < ROLE_Authority) {
-		ServerSetAirJumpDirection(AirJumpDirection);
-	}
+
 }
 
 void UNinjaMovementComponent::ServerSetAirJumpDirection_Implementation(const FVector& Direction)
 {
 	AirJumpDirection = Direction;
-
 }
 
 bool UNinjaMovementComponent::ServerSetAirJumpDirection_Validate(const FVector& Direction)
