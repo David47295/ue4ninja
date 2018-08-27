@@ -16,10 +16,11 @@ class NINJA_API ANinjaGameModeBase : public AGameModeBase
 public:
 	ANinjaGameModeBase();
 
-	void BeginRound();
+	UFUNCTION(BlueprintCallable, Category="Ninja")
+		void BeginRound();
 
 	AActor * ChoosePlayerStart_Implementation(AController * Player) override;
 	
-	
+	void ClearPlayerStartTags();
 	
 };
