@@ -95,6 +95,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ninja Movement")
 		FRotator SpriteLeftRot = FRotator(0.f, -90.f, 0.f);
+
+	UFUNCTION(Server, Reliable, WithValidation, Category = "Ninja Attacking")
+		void RegisterHit();
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

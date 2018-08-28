@@ -7,6 +7,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/BoxComponent.h"
 #include "Engine/World.h"
+#include "NinjaPlayerState.h"
+#include "NinjaGameModeBase.h"
 
 #define CAMERA_ARM_LENGTH 500.f
 
@@ -46,6 +48,30 @@ void ANinjaCharacter::BeginPlay()
 	Super::BeginPlay();
 	//AttackHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
+
+void ANinjaCharacter::RegisterHit_Implementation()
+{
+	UWorld* World = GetWorld();
+	if (World) {
+		AController* Controller = GetController();
+		if (Controller) {
+			ANinjaPlayerState* PS = (ANinjaPlayerState*)Controller->PlayerState;
+			if (PS) {
+				PS->PlayerScore++;
+				ANinjaGameModeBase* GameMode = (ANinjaGameModeBase*) World->GetAuthGameMode();
+				if (GameMode) {
+					GameMode->BeginRound();
+				}
+			}
+		}
+	}
+}
+
+bool ANinjaCharacter::RegisterHit_Validate()
+{
+	return true;
+}
+
 
 // Called every frame
 void ANinjaCharacter::Tick(float DeltaTime)
@@ -196,16 +222,14 @@ void ANinjaCharacter::HandleAttack()
 				if (Target) {
 					GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("HIT Frame: %d"), CurrFrame));
 					AttackHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+					RegisterHit();
 				}
 			}
 			else if (CurrFrame >= AnimLength - 1) {
-				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, TEXT("Enabling input"));
+				//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, TEXT("Enabling input"));
 				APlayerController* MyController = (APlayerController*)GetController();
 				if (MyController) {
 					EnableInput(MyController);
-				}
-				else {
-					GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, TEXT("Error"));
 				}
 				AttackHitbox->SetActive(false);
 				bIsAttacking = false;
