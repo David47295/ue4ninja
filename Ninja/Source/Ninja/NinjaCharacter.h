@@ -70,7 +70,15 @@ protected:
 	UFUNCTION(Server, unreliable, WithValidation, Category = "Ninja Attacking")
 		virtual void ServerSetAttackHitboxLocation(float Value);
 
-	virtual void HandleAttack();
+	UFUNCTION()
+		//virtual void HandleAttack(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+		virtual void HandleAttack();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Ninja Attacking")
+		float AttackAnimLength;
+
+	UPROPERTY()
+		float AttackAnimTimer;
 
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category="Ninja Movement")
 		bool bIsMoving;

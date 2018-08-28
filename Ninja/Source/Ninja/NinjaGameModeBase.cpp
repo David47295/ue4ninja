@@ -21,12 +21,13 @@ void ANinjaGameModeBase::BeginRound()
 				ACharacter* Character = Cont->GetCharacter();
 				APlayerStart* PS = (APlayerStart*)ChoosePlayerStart(Cont);
 				if (PS) {
-					
 					PS->PlayerStartTag = FName(TEXT("Taken"));
-					//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("Tag: %s"), *PS->PlayerStartTag.ToString()));
-					Character->SetActorLocation(PS->GetActorLocation());
+					Character->Destroy();
+					FActorSpawnParameters Params;
+					Params.Owner = Cont;
+					ANinjaCharacter* SpawnedChar = World->SpawnActor<ANinjaCharacter>(Character->GetClass(), PS->GetActorLocation(), PS->GetActorRotation(), Params);
+					Cont->Possess(SpawnedChar);
 				}
-				
 				
 			}
 		}

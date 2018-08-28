@@ -22,7 +22,6 @@ ANinjaCharacter::ANinjaCharacter(const FObjectInitializer& ObjectInitializer)
 	CameraBoom->TargetArmLength = CAMERA_ARM_LENGTH;
 	AttackHitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("AttackHitbox"));
 	AttackHitbox->RelativeLocation = AttackHitboxLocation;
-	AttackHitbox->SetActive(false);
 	AttackHitbox->bHiddenInGame = false;
 	AttackHitbox->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	//CameraBoom->SetWorldRotation(FRotator(0.f, -180.f, 0.f));
@@ -31,6 +30,8 @@ ANinjaCharacter::ANinjaCharacter(const FObjectInitializer& ObjectInitializer)
 	Sprite = CreateDefaultSubobject<UPaperFlipbookComponent>(TEXT("Sprite"));
 	Sprite->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	Sprite->SetIsReplicated(true);
+
+	//AttackHitbox->OnComponentBeginOverlap.AddDynamic(this, &ANinjaCharacter::HandleAttack);
 }
 
 void ANinjaCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -43,6 +44,7 @@ void ANinjaCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 void ANinjaCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	//AttackHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 // Called every frame
@@ -53,7 +55,19 @@ void ANinjaCharacter::Tick(float DeltaTime)
 	SetSpriteRotation();
 	SetAttackHitboxLocation(right);
 	HandleAttack();
-
+	//if (bIsAttacking) {
+	//	if (AttackAnimTimer > 0.f) {
+	//		AttackAnimTimer -= DeltaTime;
+	//	}
+	//	else {
+	//		bIsAttacking = false;
+	//		APlayerController* PC = (APlayerController*)GetController();
+	//		if (PC) {
+	//			EnableInput(PC);
+	//			//AttackHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//		}
+	//	}
+	//}
 
 }
 
@@ -72,11 +86,13 @@ void ANinjaCharacter::MoveRight(float Value) {
 
 void ANinjaCharacter::Attack() {
 	bIsAttacking = true;
-	AttackHitbox->SetActive(true);
+	//AttackHitbox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	if (!(GetCharacterMovement()->IsFalling())) {
 		APlayerController* MyController = (APlayerController*)GetController();
 		if (MyController) { DisableInput(MyController); }
 	}
+
+	AttackAnimTimer = AttackAnimLength;
 }
 
 void ANinjaCharacter::SetIsMoving(float Value)
@@ -88,6 +104,16 @@ void ANinjaCharacter::SetIsMoving(float Value)
 	}
 
 	bIsMoving = Value != 0.f;
+}
+
+void ANinjaCharacter::ServerSetIsMoving_Implementation(float Value)
+{
+	SetIsMoving(Value);
+}
+
+bool ANinjaCharacter::ServerSetIsMoving_Validate(float Value)
+{
+	return (-1.f <= Value && Value <= 1.f);
 }
 
 void ANinjaCharacter::SetSpriteRotation()
@@ -122,23 +148,6 @@ bool ANinjaCharacter::ServerSetSpriteRotation_Validate(float Value)
 {
 	return (-1.f <= Value && Value <= 1.f);
 }
-
-void ANinjaCharacter::ServerSetIsMoving_Implementation(float Value)
-{
-	//if (Role == ROLE_Authority) {
-		//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("Value: %f"), Value));
-
-		SetIsMoving(Value);
-	//}
-	
-	//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("bIsMoving: %d"), bIsMoving));
-}
-
-bool ANinjaCharacter::ServerSetIsMoving_Validate(float Value)
-{
-	return (-1.f <= Value && Value <= 1.f);
-}
-
 
 void ANinjaCharacter::SetAttackHitboxLocation(float Value)
 {
@@ -186,7 +195,7 @@ void ANinjaCharacter::HandleAttack()
 				ANinjaCharacter* Target = (ANinjaCharacter*)Actors.GetData();
 				if (Target) {
 					GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("HIT Frame: %d"), CurrFrame));
-
+					AttackHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				}
 			}
 			else if (CurrFrame >= AnimLength - 1) {
