@@ -57,7 +57,8 @@ void ANinjaCharacter::RegisterHit_Implementation()
 		if (Controller) {
 			ANinjaPlayerState* PS = (ANinjaPlayerState*)Controller->PlayerState;
 			if (PS) {
-				PS->PlayerScore++;
+				PS->Score++;
+				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("Score: %f"), PS->Score));
 				ANinjaGameModeBase* GameMode = (ANinjaGameModeBase*) World->GetAuthGameMode();
 				if (GameMode) {
 					GameMode->BeginRound();
@@ -81,19 +82,6 @@ void ANinjaCharacter::Tick(float DeltaTime)
 	SetSpriteRotation();
 	SetAttackHitboxLocation(right);
 	HandleAttack();
-	//if (bIsAttacking) {
-	//	if (AttackAnimTimer > 0.f) {
-	//		AttackAnimTimer -= DeltaTime;
-	//	}
-	//	else {
-	//		bIsAttacking = false;
-	//		APlayerController* PC = (APlayerController*)GetController();
-	//		if (PC) {
-	//			EnableInput(PC);
-	//			//AttackHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	//		}
-	//	}
-	//}
 
 }
 

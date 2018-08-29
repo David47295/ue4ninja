@@ -15,7 +15,6 @@ class NINJA_API ANinjaPlayerState : public APlayerState
 	GENERATED_BODY()
 	
 public:
-	int32 PlayerScore;
 	
 	
 };
