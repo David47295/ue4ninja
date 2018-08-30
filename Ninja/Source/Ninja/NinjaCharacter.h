@@ -33,7 +33,8 @@ protected:
 
 	UCameraComponent* MainCamera;
 
-	USpringArmComponent* CameraBoom;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Debug")
+		USpringArmComponent* CameraBoom;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ninja Attacking")
 		UBoxComponent* AttackHitbox;

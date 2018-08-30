@@ -15,6 +15,9 @@ class NINJA_API ANinjaPlayerState : public APlayerState
 	GENERATED_BODY()
 	
 public:
-	
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&OutLifetimeProps) const override;
+
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category="Debug")
+		bool bIsMyTurn;
 	
 };
