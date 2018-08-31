@@ -4,6 +4,8 @@
 #include "NinjaCharacter.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerStart.h"
+#include "NinjaPlayerState.h"
+#include "NinjaGameStateBase.h"
 
 
 ANinjaGameModeBase::ANinjaGameModeBase() {
@@ -67,3 +69,29 @@ void ANinjaGameModeBase::ClearPlayerStartTags() {
 		}
 	}
 }
+
+void ANinjaGameModeBase::EndTurn()
+{
+	UWorld* World = GetWorld();
+	if (World) {
+		ANinjaGameStateBase* GS = (ANinjaGameStateBase*)GameState;
+		if (GS) {
+			ANinjaPlayerState* PState = (ANinjaPlayerState*)GS->PlayerArray[ActivePlayerId];
+			if (PState) {
+				PState->bIsMyTurn = false;
+
+				if (ActivePlayerId == 0) {
+					ActivePlayerId = 1;
+				}
+				else {
+					ActivePlayerId = 0;
+				}
+
+				PState = (ANinjaPlayerState*)GS->PlayerArray[ActivePlayerId];
+				PState->bIsMyTurn = true;
+			}
+		}
+	}
+}
+
+
