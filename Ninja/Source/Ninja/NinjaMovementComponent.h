@@ -19,13 +19,27 @@ public:
 
 	virtual void OnMovementUpdated(float DeltaSeconds, const FVector & OldLocation, const FVector & OldVelocity) override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Debug")
-		FVector AirJumpDirection;
+	FVector AirJumpDirection;
+
+	FVector AttackDashDirection;
+
+	uint8 bWantsToDash : 1;
 
 	void SetAirJumpDirection();
 
 	UFUNCTION(Server, Unreliable, WithValidation, Category = "Ninja Jumping")
 		void ServerSetAirJumpDirection(const FVector& Direction);
+
+	void SetAttackDashDirection();
+
+	UFUNCTION(Server, Unreliable, WithValidation, Category = "Ninja Attacking")
+		void ServerSetAttackDashDirection(const FVector& Direction);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Ninja Attacking")
+		float AttackDashPower;
+
+	UFUNCTION(Server, Unreliable, WithValidation, Category = "Ninja Attacking")
+		void ServerDoDash();
 
 	virtual class FNetworkPredictionData_Client* GetPredictionData_Client() const override;
 
@@ -34,9 +48,11 @@ public:
 class FSavedMove_Ninja : public FSavedMove_Character
 {
 public:
-	//float SavedRightAxis;
+	FVector SavedAttackDashDirection;
 
 	FVector SavedAirJumpDirection;
+
+	uint8 bSavedWantsToDash : 1;
 
 	typedef FSavedMove_Character Super;
 

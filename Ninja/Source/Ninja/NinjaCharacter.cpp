@@ -89,7 +89,7 @@ void ANinjaCharacter::Tick(float DeltaTime)
 void ANinjaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
+	
 }
 
 void ANinjaCharacter::MoveRight(float Value) {
@@ -101,12 +101,18 @@ void ANinjaCharacter::MoveRight(float Value) {
 void ANinjaCharacter::Attack() {
 	bIsAttacking = true;
 	//AttackHitbox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	if (!(GetCharacterMovement()->IsFalling())) {
-		APlayerController* MyController = (APlayerController*)GetController();
-		if (MyController) { DisableInput(MyController); }
+	UNinjaMovementComponent* CharMov = (UNinjaMovementComponent*)GetCharacterMovement();
+	if (CharMov) {
+		if (!(CharMov->IsFalling())) {
+			APlayerController* MyController = (APlayerController*)GetController();
+			if (MyController) {
+				DisableInput(MyController);
+			}
+		}
+		CharMov->SetAttackDashDirection();
 	}
-
 	AttackAnimTimer = AttackAnimLength;
+	
 }
 
 void ANinjaCharacter::SetIsMoving(float Value)
@@ -183,7 +189,6 @@ void ANinjaCharacter::SetAttackHitboxLocation(float Value)
 			AttackHitbox->SetRelativeLocation(AttackHitboxLocation);
 		}
 	}
-
 }
 
 void ANinjaCharacter::ServerSetAttackHitboxLocation_Implementation(float Value)
@@ -201,19 +206,19 @@ void ANinjaCharacter::HandleAttack()
 	if (bIsAttacking) {
 		if (Sprite) {
 			int32 AnimLength = Sprite->GetFlipbookLengthInFrames();
-			int32 CurrFrame = Sprite->GetPlaybackPositionInFrames();
-			if (GrndAttackStartFrame <= CurrFrame && CurrFrame <= GrndAttackEndFrame) {
+			AttackCurrFrame = Sprite->GetPlaybackPositionInFrames();
+			if (GrndAttackStartFrame <= AttackCurrFrame && AttackCurrFrame <= GrndAttackEndFrame) {
 				//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, FString::Printf(TEXT("Frame: %d"), CurrFrame));
 				TArray<AActor*> Actors = TArray<AActor*>();
 				AttackHitbox->GetOverlappingActors(Actors);
 				ANinjaCharacter* Target = (ANinjaCharacter*)Actors.GetData();
 				if (Target) {
-					GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("HIT Frame: %d"), CurrFrame));
+					GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("HIT Frame: %d"), AttackCurrFrame));
 					AttackHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 					RegisterHit();
 				}
 			}
-			else if (CurrFrame >= AnimLength - 1) {
+			else if (AttackCurrFrame >= AnimLength - 1) {
 				//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, TEXT("Enabling input"));
 				APlayerController* MyController = (APlayerController*)GetController();
 				if (MyController) {

@@ -45,9 +45,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ninja Sprite")
 		UPaperFlipbookComponent* Sprite;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ninja Attacking")
-		bool bIsAttacking;
-
 	UFUNCTION(BlueprintCallable, Category="Ninja Attacking")
 		virtual void Attack();
 
@@ -81,6 +78,11 @@ protected:
 	UPROPERTY()
 		float AttackAnimTimer;
 
+	float DashAttackSpeed;
+
+	UPROPERTY(Visibleanywhere, BlueprintReadOnly, Category="Debug")
+	int32 AttackCurrFrame = 0;
+
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category="Ninja Movement")
 		bool bIsMoving;
 	//virtual bool AttackConnected();
@@ -105,5 +107,8 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ninja Attacking")
+		bool bIsAttacking;
 	
 };
