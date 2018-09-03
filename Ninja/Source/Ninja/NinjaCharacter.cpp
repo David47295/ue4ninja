@@ -97,7 +97,6 @@ void ANinjaCharacter::MoveRight(float Value) {
 }
 
 
-
 void ANinjaCharacter::Attack() {
 	bIsAttacking = true;
 	//AttackHitbox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
