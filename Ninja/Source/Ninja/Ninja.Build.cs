@@ -8,7 +8,7 @@ public class Ninja : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Paper2D" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Paper2D", "OnlineSubsystemNull" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
