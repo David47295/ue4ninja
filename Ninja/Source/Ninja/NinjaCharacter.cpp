@@ -20,17 +20,15 @@ ANinjaCharacter::ANinjaCharacter(const FObjectInitializer& ObjectInitializer)
 	PrimaryActorTick.bCanEverTick = true;
 	MainCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("MainCamera"));
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = CAMERA_ARM_LENGTH;
 	AttackHitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("AttackHitbox"));
 	AttackHitbox->RelativeLocation = AttackHitboxLocation;
 	AttackHitbox->bHiddenInGame = false;
-	AttackHitbox->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	//CameraBoom->SetWorldRotation(FRotator(0.f, -180.f, 0.f));
-	//CameraBoom->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	MainCamera->AttachToComponent(CameraBoom, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	AttackHitbox->SetupAttachment(RootComponent);
+	MainCamera->SetupAttachment(CameraBoom);
 	Sprite = CreateDefaultSubobject<UPaperFlipbookComponent>(TEXT("Sprite"));
-	Sprite->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	Sprite->SetupAttachment(RootComponent);
 	Sprite->SetIsReplicated(true);
 
 	//AttackHitbox->OnComponentBeginOverlap.AddDynamic(this, &ANinjaCharacter::HandleAttack);
@@ -47,6 +45,10 @@ void ANinjaCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	//AttackHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//CameraBoom->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	//AttackHitbox->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	//MainCamera->AttachToComponent(CameraBoom, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	//Sprite->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 }
 
 void ANinjaCharacter::RegisterHit_Implementation()
