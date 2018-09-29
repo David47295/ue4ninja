@@ -211,7 +211,7 @@ void ANinjaCharacter::HandleAttack()
 			if (GrndAttackStartFrame <= AttackCurrFrame && AttackCurrFrame <= GrndAttackEndFrame) {
 				//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, FString::Printf(TEXT("Frame: %d"), CurrFrame));
 				TArray<AActor*> Actors = TArray<AActor*>();
-				AttackHitbox->GetOverlappingActors(Actors);
+				AttackHitbox->GetOverlappingActors(Actors, ACharacter::StaticClass());
 				ANinjaCharacter* Target = (ANinjaCharacter*)Actors.GetData();
 				if (Target) {
 					GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("HIT Frame: %d"), AttackCurrFrame));
