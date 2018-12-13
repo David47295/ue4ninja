@@ -9,6 +9,7 @@
 #include "Engine/World.h"
 #include "NinjaPlayerState.h"
 #include "NinjaGameModeBase.h"
+#include "Kismet/GameplayStatics.h"
 
 #define CAMERA_ARM_LENGTH 500.f
 
@@ -100,20 +101,24 @@ void ANinjaCharacter::MoveRight(float Value) {
 
 
 void ANinjaCharacter::Attack() {
-	bIsAttacking = true;
-	//AttackHitbox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	UNinjaMovementComponent* CharMov = (UNinjaMovementComponent*)GetCharacterMovement();
-	if (CharMov) {
-		if (!(CharMov->IsFalling())) {
-			APlayerController* MyController = (APlayerController*)GetController();
-			if (MyController) {
-				DisableInput(MyController);
+	UWorld* World = GetWorld();
+	if (World) {
+		bIsAttacking = true;
+		//AttackHitbox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		UNinjaMovementComponent* CharMov = (UNinjaMovementComponent*)GetCharacterMovement();
+		if (CharMov) {
+			if (!(CharMov->IsFalling())) {
+				APlayerController* MyController = (APlayerController*)GetController();
+				if (MyController) {
+					DisableInput(MyController);
+					UGameplayStatics::SetGlobalTimeDilation(World, 1.f);
+				}
 			}
+			CharMov->SetAttackDashDirection();
 		}
-		CharMov->SetAttackDashDirection();
+		AttackAnimTimer = AttackAnimLength;
+
 	}
-	AttackAnimTimer = AttackAnimLength;
-	
 }
 
 void ANinjaCharacter::SetIsMoving(float Value)
@@ -217,6 +222,7 @@ void ANinjaCharacter::HandleAttack()
 					GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("HIT Frame: %d"), AttackCurrFrame));
 					AttackHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 					RegisterHit();
+
 				}
 			}
 			else if (AttackCurrFrame >= AnimLength - 1) {
@@ -228,7 +234,12 @@ void ANinjaCharacter::HandleAttack()
 				AttackHitbox->SetActive(false);
 				bIsAttacking = false;
 			}
+			UWorld* World = GetWorld();
+			if (World) {
+				UGameplayStatics::SetGlobalTimeDilation(World, 0.f);
+			}
 		}
+
 	}
 		
 }

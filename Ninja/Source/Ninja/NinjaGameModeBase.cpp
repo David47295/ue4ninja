@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerStart.h"
 #include "NinjaPlayerState.h"
 #include "NinjaGameStateBase.h"
+#include "Kismet/GameplayStatics.h"
 
 
 ANinjaGameModeBase::ANinjaGameModeBase() {
@@ -31,6 +32,14 @@ void ANinjaGameModeBase::BeginRound()
 					Cont->Possess(SpawnedChar);
 				}
 				
+			}
+		}
+		ANinjaGameStateBase* GS = (ANinjaGameStateBase*)GameState;
+		if (GS) {
+			ANinjaPlayerState* PState = (ANinjaPlayerState*)GS->PlayerArray[0];
+			if (PState) {
+				PState->bIsMyTurn = true;
+				UGameplayStatics::SetGlobalTimeDilation(World, 0.f);
 			}
 		}
 	}
