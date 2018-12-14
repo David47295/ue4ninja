@@ -21,6 +21,8 @@ public:
 
 	AActor * ChoosePlayerStart_Implementation(AController * Player) override;
 	
+	FTimerHandle ActionPhaseTimerHandle;
+
 	void ClearPlayerStartTags();
 	
 	UFUNCTION(BlueprintCallable, Category = "Ninja Gameflow")
@@ -28,5 +30,8 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Ninja Gameflow")
 		int32 ActivePlayerId = 0;
+
+	UFUNCTION()
+		void StartActionPhaseTimer(float length);
 
 };

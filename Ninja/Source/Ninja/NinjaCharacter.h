@@ -45,7 +45,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ninja Sprite")
 		UPaperFlipbookComponent* Sprite;
 
-	UFUNCTION(BlueprintCallable, Category="Ninja Attacking")
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category="Ninja Attacking")
 		virtual void Attack();
 
 	/**
@@ -73,7 +73,7 @@ protected:
 		virtual void HandleAttack();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Ninja Attacking")
-		float AttackAnimLength;
+		float AttackAnimLength = 1.f;
 
 	UPROPERTY()
 		float AttackAnimTimer;
@@ -101,6 +101,12 @@ protected:
 
 	UFUNCTION(Server, Reliable, WithValidation, Category = "Ninja Attacking")
 		void RegisterHit();
+
+	UFUNCTION(Server, unreliable, WithValidation)
+		void SetWorldTime_Server(float scale);
+
+	UFUNCTION(NetMulticast, unreliable)
+		void SetWorldTime_Client(float scale);
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

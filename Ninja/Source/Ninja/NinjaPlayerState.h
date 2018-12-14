@@ -17,7 +17,10 @@ class NINJA_API ANinjaPlayerState : public APlayerState
 public:
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&OutLifetimeProps) const override;
 
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category="Debug")
+	UPROPERTY(Transient, ReplicatedUsing=OnRep_IsMyTurn)
 		bool bIsMyTurn;
-	
+
+	UFUNCTION(Server, Reliable, WithValidation)
+		void OnRep_IsMyTurn();
+
 };

@@ -7,6 +7,7 @@
 #include "NinjaPlayerState.h"
 #include "NinjaGameStateBase.h"
 #include "Kismet/GameplayStatics.h"
+//#include "Public/TimerManager.h"
 
 
 ANinjaGameModeBase::ANinjaGameModeBase() {
@@ -39,7 +40,7 @@ void ANinjaGameModeBase::BeginRound()
 			ANinjaPlayerState* PState = (ANinjaPlayerState*)GS->PlayerArray[0];
 			if (PState) {
 				PState->bIsMyTurn = true;
-				UGameplayStatics::SetGlobalTimeDilation(World, 0.f);
+				//UGameplayStatics::SetGlobalTimeDilation(World, 0.f);
 			}
 		}
 	}
@@ -104,3 +105,11 @@ void ANinjaGameModeBase::EndTurn()
 }
 
 
+
+void ANinjaGameModeBase::StartActionPhaseTimer(float length)
+{
+	UWorld* World = GetWorld();
+	if (World) {
+		World->GetTimerManager().SetTimer(ActionPhaseTimerHandle, this, &ANinjaGameModeBase::EndTurn, length, false);
+	}
+}
