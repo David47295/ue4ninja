@@ -11,8 +11,10 @@
 #include "NinjaGameModeBase.h"
 #include "NinjaGameStateBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "EngineUtils.h"
 
 #define CAMERA_ARM_LENGTH 500.f
+#define WORLD_FREEZE_TIME_SCALE 0.f
 
 // Sets default values
 ANinjaCharacter::ANinjaCharacter(const FObjectInitializer& ObjectInitializer)
@@ -77,6 +79,17 @@ bool ANinjaCharacter::RegisterHit_Validate()
 	return true;
 }
 
+void ANinjaCharacter::SetWorldTime(float scale)
+{
+	UWorld* World = GetWorld();
+	if (World) {
+		for (TActorIterator<ANinjaCharacter> ActorItr(World); ActorItr; ++ActorItr) {
+			ANinjaCharacter* Char = *ActorItr;
+			Char->CustomTimeDilation = scale;
+		}
+	}
+}
+
 // Called every frame
 void ANinjaCharacter::Tick(float DeltaTime)
 {
@@ -106,10 +119,8 @@ void ANinjaCharacter::Attack_Implementation() {
 		bIsAttacking = true;
 		ANinjaGameModeBase* GameMode = (ANinjaGameModeBase*)World->GetAuthGameMode();
 		if (GameMode) {
-
-			GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("Value: %s"), *GameMode->GetName()));
 			GameMode->StartActionPhaseTimer(AttackAnimLength);
-			SetWorldTime_Server(.5f);
+			SetWorldTime_Server(WORLD_FREEZE_TIME_SCALE);
 		}
 	}
 }
@@ -120,19 +131,8 @@ bool ANinjaCharacter::Attack_Validate() {
 
 void ANinjaCharacter::SetWorldTime_Server_Implementation(float scale)
 {
-	UWorld* World = GetWorld();
-	if (World) {
-		AGameStateBase* GS = World->GetGameState<AGameStateBase>();
-		if (GS) {
-			for (auto& PlayerState : GS->PlayerArray) {
-				AController* Controller = (AController*)PlayerState->GetOwner();
-				if (Controller && Controller->GetPawn()) {
-					Controller->GetPawn()->CustomTimeDilation = scale;
-				}
-			}
-		}
-		SetWorldTime_Client(scale);
-	}
+	SetWorldTime(scale);
+	SetWorldTime_Client(scale);
 }
 
 bool ANinjaCharacter::SetWorldTime_Server_Validate(float scale)
@@ -141,18 +141,7 @@ bool ANinjaCharacter::SetWorldTime_Server_Validate(float scale)
 }
 
 void ANinjaCharacter::SetWorldTime_Client_Implementation(float scale) {
-	UWorld* World = GetWorld();
-	if (World) {
-		AGameStateBase* GS = World->GetGameState<AGameStateBase>();
-		if (GS) {
-			for (auto& PlayerState : GS->PlayerArray) {
-				AController* Controller = (AController*)PlayerState->GetOwner();
-				if (Controller && Controller->GetPawn()) {
-					Controller->GetPawn()->CustomTimeDilation = scale;
-				}
-			}
-		}
-	}
+	SetWorldTime(scale);
 }
 
 void ANinjaCharacter::SetIsMoving(float Value)

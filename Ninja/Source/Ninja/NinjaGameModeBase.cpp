@@ -104,8 +104,6 @@ void ANinjaGameModeBase::EndTurn()
 	}
 }
 
-
-
 void ANinjaGameModeBase::StartActionPhaseTimer(float length)
 {
 	UWorld* World = GetWorld();

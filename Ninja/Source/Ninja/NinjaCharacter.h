@@ -107,6 +107,10 @@ protected:
 
 	UFUNCTION(NetMulticast, unreliable)
 		void SetWorldTime_Client(float scale);
+
+	UFUNCTION()
+		void SetWorldTime(float scale);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
