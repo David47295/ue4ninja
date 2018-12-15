@@ -31,4 +31,12 @@ bool ANinjaPlayerState::OnRep_IsMyTurn_Validate()
 	return true;
 }
 
+bool ANinjaPlayerState::GetIsMyTurn() const
+{
+	return bIsMyTurn;
+}
 
+void ANinjaPlayerState::SetIsMyTurn(bool turn)
+{
+	bIsMyTurn = turn;
+}

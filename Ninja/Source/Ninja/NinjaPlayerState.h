@@ -23,4 +23,9 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 		void OnRep_IsMyTurn();
 
+	UFUNCTION(BlueprintCallable, Category = "Ninja")
+		bool GetIsMyTurn() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Ninja")
+		void SetIsMyTurn(bool turn);
 };

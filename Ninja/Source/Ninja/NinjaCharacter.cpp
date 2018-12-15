@@ -13,8 +13,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "EngineUtils.h"
 
+
 #define CAMERA_ARM_LENGTH 500.f
 #define WORLD_FREEZE_TIME_SCALE 0.f
+#define WORLD_REAL_TIME_SCALE 1.f
 
 // Sets default values
 ANinjaCharacter::ANinjaCharacter(const FObjectInitializer& ObjectInitializer)
@@ -42,17 +44,14 @@ void ANinjaCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ANinjaCharacter, bIsMoving);
+
 }
 
 // Called when the game starts or when spawned
 void ANinjaCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	//AttackHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	//CameraBoom->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	//AttackHitbox->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	//MainCamera->AttachToComponent(CameraBoom, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	//Sprite->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	SetWorldTime(WORLD_FREEZE_TIME_SCALE);
 }
 
 void ANinjaCharacter::RegisterHit_Implementation()
@@ -77,17 +76,6 @@ void ANinjaCharacter::RegisterHit_Implementation()
 bool ANinjaCharacter::RegisterHit_Validate()
 {
 	return true;
-}
-
-void ANinjaCharacter::SetWorldTime(float scale)
-{
-	UWorld* World = GetWorld();
-	if (World) {
-		for (TActorIterator<ANinjaCharacter> ActorItr(World); ActorItr; ++ActorItr) {
-			ANinjaCharacter* Char = *ActorItr;
-			Char->CustomTimeDilation = scale;
-		}
-	}
 }
 
 // Called every frame
@@ -120,10 +108,16 @@ void ANinjaCharacter::Attack_Implementation() {
 		ANinjaGameModeBase* GameMode = (ANinjaGameModeBase*)World->GetAuthGameMode();
 		if (GameMode) {
 			GameMode->StartActionPhaseTimer(AttackAnimLength);
-			SetWorldTime_Server(WORLD_FREEZE_TIME_SCALE);
+			SetWorldTime_Server(WORLD_REAL_TIME_SCALE);
+
+			UNinjaMovementComponent* CharMov = (UNinjaMovementComponent*)GetCharacterMovement();
+			if (CharMov) {
+				CharMov->SetAttackDashDirection();
+			}
 		}
 	}
 }
+
 
 bool ANinjaCharacter::Attack_Validate() {
 	return true;
@@ -142,6 +136,17 @@ bool ANinjaCharacter::SetWorldTime_Server_Validate(float scale)
 
 void ANinjaCharacter::SetWorldTime_Client_Implementation(float scale) {
 	SetWorldTime(scale);
+}
+
+void ANinjaCharacter::SetWorldTime(float scale)
+{
+	UWorld* World = GetWorld();
+	if (World) {
+		for (TActorIterator<ANinjaCharacter> ActorItr(World); ActorItr; ++ActorItr) {
+			ANinjaCharacter* Char = *ActorItr;
+			Char->CustomTimeDilation = scale;
+		}
+	}
 }
 
 void ANinjaCharacter::SetIsMoving(float Value)

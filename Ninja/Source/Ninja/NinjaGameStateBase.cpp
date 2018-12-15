@@ -2,5 +2,7 @@
 
 #include "NinjaGameStateBase.h"
 #include "NinjaGameModeBase.h"
+#include "NinjaCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "EngineUtils.h"
 

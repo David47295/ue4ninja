@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "NinjaGameModeBase.generated.h"
 
+
+class ANinjaCharacter;
 /**
  * 
  */
@@ -31,7 +33,13 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Ninja Gameflow")
 		int32 ActivePlayerId = 0;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ninja")
+		TSubclassOf<ANinjaCharacter> BPNinjaCharacterClass;
+
 	UFUNCTION()
 		void StartActionPhaseTimer(float length);
+
+	//UFUNCTION()
+	//	virtual void PostLogin(APlayerController* NewPlayer) override;
 
 };

@@ -7,11 +7,11 @@
 #include "NinjaPlayerState.h"
 #include "NinjaGameStateBase.h"
 #include "Kismet/GameplayStatics.h"
-//#include "Public/TimerManager.h"
+#include "ConstructorHelpers.h"
 
 
 ANinjaGameModeBase::ANinjaGameModeBase() {
-	DefaultPawnClass = ANinjaCharacter::StaticClass();
+	//DefaultPawnClass = ANinjaCharacter::StaticClass();
 }
 
 void ANinjaGameModeBase::BeginRound()
@@ -22,25 +22,32 @@ void ANinjaGameModeBase::BeginRound()
 		for (TActorIterator<APlayerController> Itr(World); Itr; ++Itr) {
 			APlayerController* Cont = *Itr;
 			if (Cont) {
+				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, TEXT("Controller"));
 				ACharacter* Character = Cont->GetCharacter();
 				APlayerStart* PS = (APlayerStart*)ChoosePlayerStart(Cont);
 				if (PS) {
 					PS->PlayerStartTag = FName(TEXT("Taken"));
-					Character->Destroy();
+					if (Character) {
+						Character->Destroy();
+					}
+
 					FActorSpawnParameters Params;
 					Params.Owner = Cont;
-					ANinjaCharacter* SpawnedChar = World->SpawnActor<ANinjaCharacter>(Character->GetClass(), PS->GetActorLocation(), PS->GetActorRotation(), Params);
-					Cont->Possess(SpawnedChar);
+					ANinjaCharacter* SpawnedChar = World->SpawnActor<ANinjaCharacter>(BPNinjaCharacterClass, PS->GetActorLocation(), PS->GetActorRotation(), Params);
+					if (SpawnedChar) {
+						Cont->Possess(SpawnedChar);
+					}
 				}
-				
+
 			}
 		}
 		ANinjaGameStateBase* GS = (ANinjaGameStateBase*)GameState;
 		if (GS) {
 			ANinjaPlayerState* PState = (ANinjaPlayerState*)GS->PlayerArray[0];
 			if (PState) {
+				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, TEXT("Setting IsmyTurn"));
+				GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Blue, FString::Printf(TEXT("Value: %s"), *PState->GetOwner()->GetName()));
 				PState->bIsMyTurn = true;
-				//UGameplayStatics::SetGlobalTimeDilation(World, 0.f);
 			}
 		}
 	}
@@ -111,3 +118,10 @@ void ANinjaGameModeBase::StartActionPhaseTimer(float length)
 		World->GetTimerManager().SetTimer(ActionPhaseTimerHandle, this, &ANinjaGameModeBase::EndTurn, length, false);
 	}
 }
+
+//void ANinjaGameModeBase::PostLogin(APlayerController * NewPlayer)
+//{
+//	if (GetNumPlayers() == 2) {
+//		
+//	}
+//}
