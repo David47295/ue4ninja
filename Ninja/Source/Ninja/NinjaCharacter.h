@@ -102,14 +102,17 @@ protected:
 	UFUNCTION(Server, Reliable, WithValidation, Category = "Ninja Attacking")
 		void RegisterHit();
 
-	UFUNCTION(Server, unreliable, WithValidation)
-		void SetWorldTime_Server(float scale);
-
 	UFUNCTION(NetMulticast, unreliable)
 		void SetWorldTime_Client(float scale);
 
 	UFUNCTION()
 		void SetWorldTime(float scale);
+
+	UFUNCTION()
+		void FreezeTime();
+	
+	UFUNCTION(Client, Unreliable)
+		void Client_SetAttackDashDir();
 
 public:	
 	// Called every frame
@@ -120,5 +123,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ninja Attacking")
 		bool bIsAttacking;
+
+	UFUNCTION(Server, unreliable, WithValidation)
+		void SetWorldTime_Server(float scale);
 	
 };

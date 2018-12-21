@@ -89,6 +89,7 @@ void ANinjaGameModeBase::ClearPlayerStartTags() {
 
 void ANinjaGameModeBase::EndTurn()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, TEXT("Turn Over!"));
 	UWorld* World = GetWorld();
 	if (World) {
 		ANinjaGameStateBase* GS = (ANinjaGameStateBase*)GameState;
@@ -106,6 +107,14 @@ void ANinjaGameModeBase::EndTurn()
 
 				PState = (ANinjaPlayerState*)GS->PlayerArray[ActivePlayerId];
 				PState->bIsMyTurn = true;
+
+				AController* Controller = (AController*)PState->GetOwner();
+				if (Controller) {
+					ANinjaCharacter* Char = (ANinjaCharacter*)Controller->GetPawn();
+					if (Char) {
+						Char->SetWorldTime_Server(1.f);
+					}
+				}
 			}
 		}
 	}

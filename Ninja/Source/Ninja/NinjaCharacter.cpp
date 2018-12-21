@@ -110,14 +110,30 @@ void ANinjaCharacter::Attack_Implementation() {
 			GameMode->StartActionPhaseTimer(AttackAnimLength);
 			SetWorldTime_Server(WORLD_REAL_TIME_SCALE);
 
+			Client_SetAttackDashDir();
 			UNinjaMovementComponent* CharMov = (UNinjaMovementComponent*)GetCharacterMovement();
 			if (CharMov) {
-				CharMov->SetAttackDashDirection();
+				CharMov->Dash();
 			}
+				//float right = GetInputAxisValue("MoveRight");
+				//float up = GetInputAxisValue("MoveUp");
+				//CharMov->SetAttackDashDirection(right);
+			World->GetTimerManager().SetTimer(GameMode->ActionPhaseTimerHandle, this, &ANinjaCharacter::FreezeTime , AttackAnimLength, false);
+			//}
 		}
 	}
 }
 
+void ANinjaCharacter::Client_SetAttackDashDir_Implementation()
+{
+	UNinjaMovementComponent* CharMov = (UNinjaMovementComponent*)GetCharacterMovement();
+	if (CharMov) {
+		float right = GetInputAxisValue("MoveRight");
+		//float up = GetInputAxisValue("MoveUp");
+		//CharMov->SetAttackDashDirection();
+		//World->GetTimerManager().SetTimer(GameMode->ActionPhaseTimerHandle, this, &ANinjaCharacter::FreezeTime , AttackAnimLength, false);
+	}
+}
 
 bool ANinjaCharacter::Attack_Validate() {
 	return true;
@@ -147,6 +163,24 @@ void ANinjaCharacter::SetWorldTime(float scale)
 			Char->CustomTimeDilation = scale;
 		}
 	}
+}
+
+void ANinjaCharacter::FreezeTime()
+{
+	UNinjaMovementComponent* CharMov = (UNinjaMovementComponent*)GetCharacterMovement();
+	if (CharMov) {
+		CharMov->StopDash();
+	}
+
+	if (Role < ROLE_Authority) {
+		SetWorldTime_Server(WORLD_FREEZE_TIME_SCALE);
+	}
+	else {
+		SetWorldTime_Client(WORLD_FREEZE_TIME_SCALE);
+	}
+	
+	SetWorldTime(WORLD_FREEZE_TIME_SCALE);
+	
 }
 
 void ANinjaCharacter::SetIsMoving(float Value)

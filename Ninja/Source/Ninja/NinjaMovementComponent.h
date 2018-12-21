@@ -19,18 +19,25 @@ public:
 
 	virtual void OnMovementUpdated(float DeltaSeconds, const FVector & OldLocation, const FVector & OldVelocity) override;
 
+	FVector MoveDirection;
+
 	FVector AirJumpDirection;
 
-	FVector AttackDashDirection;
+	UPROPERTY(BlueprintReadOnly, Category = "Ninja Attacking")
+		FVector AttackDashDirection;
 
-	uint8 bWantsToDash : 1;
+	UPROPERTY(BlueprintReadOnly, Category = "Ninja Attacking")
+		uint8 bWantsToDash : 1;
 
 	void SetAirJumpDirection();
+
+	UFUNCTION(Server, Unreliable, WithValidation, Category = "Ninja Attacking")
+		void ServerSetMoveDirection(const FVector & Dir);
 
 	UFUNCTION(Server, Unreliable, WithValidation, Category = "Ninja Jumping")
 		void ServerSetAirJumpDirection(const FVector& Direction);
 
-	void SetAttackDashDirection();
+	void SetAttackDashDirection(const FVector & Direction);
 
 	UFUNCTION(Server, Unreliable, WithValidation, Category = "Ninja Attacking")
 		void ServerSetAttackDashDirection(const FVector& Direction);
@@ -38,10 +45,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Ninja Attacking")
 		float AttackDashPower;
 
-	UFUNCTION(Server, Unreliable, WithValidation, Category = "Ninja Attacking")
-		void ServerDoDash();
+	UFUNCTION(BlueprintCallable, Category="Test")
+		void Dash();
+
+	UFUNCTION()
+		void StopDash();
 
 	virtual class FNetworkPredictionData_Client* GetPredictionData_Client() const override;
+
+private:
+	UFUNCTION()
+		void DoDash();
+
+	UFUNCTION(Server, Unreliable, WithValidation)
+		void ServerDoDash();
 
 };
 

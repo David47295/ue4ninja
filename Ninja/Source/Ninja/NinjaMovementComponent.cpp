@@ -22,25 +22,32 @@ void UNinjaMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVecto
 
 	if (!PawnOwner) { return; }
 
-	APlayerController* PC = (APlayerController*)PawnOwner->GetController();
-	if (PawnOwner->Role < ROLE_Authority && PC && PC->IsLocalController()) {
-		FVector MovementInput = PawnOwner->GetLastMovementInputVector();
-		ServerSetAirJumpDirection(MovementInput * 600.f + FVector(0.f, 0.f, 500.f));
+	if (PawnOwner->IsLocallyControlled()) {
+		MoveDirection = PawnOwner->GetLastMovementInputVector();
+		AirJumpDirection = MoveDirection * 600.f + FVector(0.f, 0.f, 500.f);
+		if (!bWantsToDash) {
+			SetAttackDashDirection(MoveDirection * AttackDashPower);
+		}
+	}
+
+	if (PawnOwner->Role < ROLE_Authority) {
+		ServerSetMoveDirection(MoveDirection);
+		ServerSetAirJumpDirection(MoveDirection * 600.f + FVector(0.f, 0.f, 500.f));
 		ServerSetAttackDashDirection(AttackDashDirection);
-		
+
 	}
 
 	SetAirJumpDirection();
 
+	DoDash();
+}
 
-	ANinjaCharacter* Char = (ANinjaCharacter*)PawnOwner;
-	if (Char && Char->bIsAttacking && AttackDashDirection != FVector::ZeroVector) {
-		Velocity = AttackDashDirection;
+void UNinjaMovementComponent::ServerSetMoveDirection_Implementation(const FVector & Dir) {
+	MoveDirection = Dir;
+}
 
-		if (PawnOwner->Role < ROLE_Authority) {
-			ServerDoDash();
-		}
-	}
+bool UNinjaMovementComponent::ServerSetMoveDirection_Validate(const FVector & Dir) {
+	return true;
 }
 
 void UNinjaMovementComponent::SetAirJumpDirection() {
@@ -50,25 +57,18 @@ void UNinjaMovementComponent::SetAirJumpDirection() {
 	}
 }
 
-void UNinjaMovementComponent::SetAttackDashDirection()
+void UNinjaMovementComponent::SetAttackDashDirection(const FVector & Direction)
 {
-	APlayerController* PC = (APlayerController*)PawnOwner->GetController();
-	if (PC) {
-		FVector Dir = PawnOwner->GetLastMovementInputVector();
-		//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("Y: %f"), Dir.Y));
-		if (Dir.Y != 0.f) {
-			AttackDashDirection = Dir * AttackDashPower;
-		}
-		else {
-			AttackDashDirection = FVector::ZeroVector;
-		}
+	//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("X: %f Y: %f Z: %f"),Dir.X,  Dir.Y, Dir.Z));
+	AttackDashDirection = Direction;
 
-	}
 }
 
 void UNinjaMovementComponent::ServerSetAttackDashDirection_Implementation(const FVector & Direction)
 {
-	AttackDashDirection = Direction;
+	if (!bWantsToDash) {
+		AttackDashDirection = Direction;
+	}
 }
 
 bool UNinjaMovementComponent::ServerSetAttackDashDirection_Validate(const FVector & Direction)
@@ -86,12 +86,42 @@ bool UNinjaMovementComponent::ServerSetAirJumpDirection_Validate(const FVector& 
 	return true;
 }
 
-void UNinjaMovementComponent::ServerDoDash_Implementation() {
-	Velocity = AttackDashDirection;
+
+void UNinjaMovementComponent::DoDash()
+{
+	ANinjaCharacter* Char = (ANinjaCharacter*)PawnOwner;
+	if (bWantsToDash && AttackDashDirection != FVector::ZeroVector) {
+		Velocity = AttackDashDirection;
+	}
+
+	if (PawnOwner->IsLocallyControlled()) {
+		ServerDoDash();
+	}
 }
 
-bool UNinjaMovementComponent::ServerDoDash_Validate() {
+void UNinjaMovementComponent::ServerDoDash_Implementation()
+{
+	ANinjaCharacter* Char = (ANinjaCharacter*)PawnOwner;
+	if (bWantsToDash && AttackDashDirection != FVector::ZeroVector) {
+		//Velocity = AttackDashDirection;
+		Launch(AttackDashDirection);
+		//bWantsToDash = false;
+	}
+}
+
+bool UNinjaMovementComponent::ServerDoDash_Validate()
+{
 	return true;
+}
+
+void UNinjaMovementComponent::Dash()
+{
+	bWantsToDash = true;
+}
+
+void UNinjaMovementComponent::StopDash()
+{
+	bWantsToDash = false;
 }
 
 FNetworkPredictionData_Client* UNinjaMovementComponent::GetPredictionData_Client() const
