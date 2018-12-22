@@ -70,8 +70,10 @@ protected:
 		virtual void ServerSetAttackHitboxLocation(float Value);
 
 	UFUNCTION()
-		//virtual void HandleAttack(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 		virtual void HandleAttack();
+
+	UFUNCTION(Server, Unreliable, WithValidation)
+		virtual void Server_HandleAttack();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Ninja Attacking")
 		float AttackAnimLength;

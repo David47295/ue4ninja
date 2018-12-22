@@ -321,3 +321,12 @@ void ANinjaCharacter::HandleAttack()
 		
 }
 
+void ANinjaCharacter::Server_HandleAttack_Implementation()
+{
+
+}
+
+bool ANinjaCharacter::Server_HandleAttack_Validate()
+{
+	return true;
+}
