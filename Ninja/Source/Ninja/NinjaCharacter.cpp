@@ -37,8 +37,6 @@ ANinjaCharacter::ANinjaCharacter(const FObjectInitializer& ObjectInitializer)
 	Sprite = CreateDefaultSubobject<UPaperFlipbookComponent>(TEXT("Sprite"));
 	Sprite->SetupAttachment(RootComponent);
 	Sprite->SetIsReplicated(true);
-
-	//AttackHitbox->OnComponentBeginOverlap.AddDynamic(this, &ANinjaCharacter::HandleAttack);
 }
 
 void ANinjaCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -135,11 +133,8 @@ void ANinjaCharacter::Attack_Implementation() {
 			if (CharMov) {
 				CharMov->Dash();
 			}
-				//float right = GetInputAxisValue("MoveRight");
-				//float up = GetInputAxisValue("MoveUp");
-				//CharMov->SetAttackDashDirection(right);
+
 			World->GetTimerManager().SetTimer(GameMode->ActionPhaseTimerHandle, this, &ANinjaCharacter::FreezeTime , AttackAnimLength, false);
-			//}
 		}
 	}
 }
