@@ -12,6 +12,7 @@ class UCameraComponent;
 class USpringArmComponent;
 class UBoxComponent;
 class UPaperFlipbookComponent;
+class UPaperFlipbook;
 
 UCLASS()
 class NINJA_API ANinjaCharacter : public ACharacter
@@ -73,7 +74,7 @@ protected:
 		virtual void HandleAttack();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Ninja Attacking")
-		float AttackAnimLength = 1.f;
+		float AttackAnimLength;
 
 	UPROPERTY()
 		float AttackAnimTimer;
@@ -81,7 +82,7 @@ protected:
 	float DashAttackSpeed;
 
 	UPROPERTY(Visibleanywhere, BlueprintReadOnly, Category="Debug")
-	int32 AttackCurrFrame = 0;
+		int32 AttackCurrFrame = 0;
 
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category="Ninja Movement")
 		bool bIsMoving;
@@ -113,6 +114,22 @@ protected:
 	
 	UFUNCTION(Client, Unreliable)
 		void Client_SetAttackDashDir();
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animations")
+		UPaperFlipbook* IdleAnimFlipbook;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animations")
+		UPaperFlipbook* WalkAnimFlipbook;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animations")
+		UPaperFlipbook* JumpAnimFlipbook;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animations")
+		UPaperFlipbook* AttackAnimFlipbook;
+
+	UFUNCTION()
+		void HandleAnimations();
 
 public:	
 	// Called every frame

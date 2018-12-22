@@ -4,6 +4,7 @@
 #include "NinjaMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "PaperFlipbookComponent.h"
+#include "PaperFlipbook.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/BoxComponent.h"
 #include "Engine/World.h"
@@ -15,7 +16,7 @@
 
 
 #define CAMERA_ARM_LENGTH 500.f
-#define WORLD_FREEZE_TIME_SCALE 0.f
+#define WORLD_FREEZE_TIME_SCALE 1.f
 #define WORLD_REAL_TIME_SCALE 1.f
 
 // Sets default values
@@ -52,6 +53,8 @@ void ANinjaCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	SetWorldTime(WORLD_FREEZE_TIME_SCALE);
+	Sprite->SetFlipbook(IdleAnimFlipbook);
+	AttackAnimLength = AttackAnimFlipbook->GetTotalDuration();
 }
 
 void ANinjaCharacter::RegisterHit_Implementation()
@@ -86,6 +89,7 @@ void ANinjaCharacter::Tick(float DeltaTime)
 	SetSpriteRotation();
 	SetAttackHitboxLocation(right);
 	HandleAttack();
+	HandleAnimations();
 
 }
 
@@ -100,6 +104,22 @@ void ANinjaCharacter::MoveRight(float Value) {
 	AddMovementInput(GetActorRightVector(), Value);
 }
 
+
+void ANinjaCharacter::HandleAnimations()
+{
+	UCharacterMovementComponent* CharMov = GetCharacterMovement();
+	if (CharMov) {
+		if (!CharMov->IsFalling() && !bIsAttacking) {
+			float right = GetInputAxisValue("MoveRight");
+			if (right != 0.f) {
+				Sprite->SetFlipbook(WalkAnimFlipbook);
+			}
+			else {
+				Sprite->SetFlipbook(IdleAnimFlipbook);
+			}
+		}
+	}
+}
 
 void ANinjaCharacter::Attack_Implementation() {
 	UWorld* World = GetWorld();
