@@ -52,31 +52,6 @@ void ANinjaCharacter::BeginPlay()
 	Super::BeginPlay();
 	SetWorldTime(WORLD_FREEZE_TIME_SCALE);
 	Sprite->SetFlipbook(IdleAnimFlipbook);
-	AttackAnimLength = AttackAnimFlipbook->GetTotalDuration();
-}
-
-void ANinjaCharacter::RegisterHit_Implementation()
-{
-	UWorld* World = GetWorld();
-	if (World) {
-		AController* Controller = GetController();
-		if (Controller) {
-			ANinjaPlayerState* PS = (ANinjaPlayerState*)Controller->PlayerState;
-			if (PS) {
-				PS->Score++;
-				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("Score: %f"), PS->Score));
-				ANinjaGameModeBase* GameMode = (ANinjaGameModeBase*) World->GetAuthGameMode();
-				if (GameMode) {
-					GameMode->BeginRound();
-				}
-			}
-		}
-	}
-}
-
-bool ANinjaCharacter::RegisterHit_Validate()
-{
-	return true;
 }
 
 // Called every frame
@@ -123,6 +98,7 @@ void ANinjaCharacter::Attack_Implementation() {
 	UWorld* World = GetWorld();
 	if (World) {
 		bIsAttacking = true;
+		AttackAnimLength = AttackAnimFlipbook->GetTotalDuration();
 		ANinjaGameModeBase* GameMode = (ANinjaGameModeBase*)World->GetAuthGameMode();
 		if (GameMode) {
 			GameMode->StartActionPhaseTimer(AttackAnimLength);
@@ -185,6 +161,8 @@ void ANinjaCharacter::FreezeTime()
 	UNinjaMovementComponent* CharMov = (UNinjaMovementComponent*)GetCharacterMovement();
 	if (CharMov) {
 		CharMov->StopDash();
+		AttackHitbox->SetActive(false);
+		bIsAttacking = false;
 	}
 
 	if (Role < ROLE_Authority) {
@@ -290,31 +268,16 @@ void ANinjaCharacter::HandleAttack()
 		if (Sprite) {
 			int32 AnimLength = Sprite->GetFlipbookLengthInFrames();
 			AttackCurrFrame = Sprite->GetPlaybackPositionInFrames();
-			if (GrndAttackStartFrame <= AttackCurrFrame && AttackCurrFrame <= GrndAttackEndFrame) {
+			//if (GrndAttackStartFrame <= AttackCurrFrame && AttackCurrFrame <= GrndAttackEndFrame) {
 				//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, FString::Printf(TEXT("Frame: %d"), CurrFrame));
 				TArray<AActor*> Actors = TArray<AActor*>();
 				AttackHitbox->GetOverlappingActors(Actors, ACharacter::StaticClass());
 				ANinjaCharacter* Target = (ANinjaCharacter*)Actors.GetData();
 				if (Target) {
-					GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("HIT Frame: %d"), AttackCurrFrame));
-					AttackHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-					RegisterHit();
+					Server_HandleAttack();
 
 				}
-			}
-			else if (AttackCurrFrame >= AnimLength - 1) {
-				//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, TEXT("Enabling input"));
-				APlayerController* MyController = (APlayerController*)GetController();
-				if (MyController) {
-					EnableInput(MyController);
-				}
-				AttackHitbox->SetActive(false);
-				bIsAttacking = false;
-			}
-			UWorld* World = GetWorld();
-			if (World) {
-				//UGameplayStatics::SetGlobalTimeDilation(World, 0.f);
-			}
+			//}
 		}
 
 	}
@@ -323,10 +286,42 @@ void ANinjaCharacter::HandleAttack()
 
 void ANinjaCharacter::Server_HandleAttack_Implementation()
 {
-
+	if (bIsAttacking) {
+		TArray<AActor*> Actors = TArray<AActor*>();
+		AttackHitbox->GetOverlappingActors(Actors, ACharacter::StaticClass());
+		ANinjaCharacter* Target = (ANinjaCharacter*)Actors.GetData();
+		if (Target) {
+			//AttackHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			RegisterHit();
+		}
+	}
 }
 
 bool ANinjaCharacter::Server_HandleAttack_Validate()
+{
+	return true;
+}
+
+void ANinjaCharacter::RegisterHit_Implementation()
+{
+	UWorld* World = GetWorld();
+	if (World) {
+		AController* Controller = GetController();
+		if (Controller) {
+			ANinjaPlayerState* PS = (ANinjaPlayerState*)Controller->PlayerState;
+			if (PS) {
+				PS->Score++;
+				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("Score: %f"), PS->Score));
+				ANinjaGameModeBase* GameMode = (ANinjaGameModeBase*)World->GetAuthGameMode();
+				if (GameMode) {
+					GameMode->BeginRound();
+				}
+			}
+		}
+	}
+}
+
+bool ANinjaCharacter::RegisterHit_Validate()
 {
 	return true;
 }
