@@ -49,14 +49,6 @@ public:
 	UFUNCTION()
 		void SetCurrentRound(int32 Round);
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ninja Widgets")
-		TSubclassOf<UUserWidget> EndScreenWidget;
-
-	
-
-protected:
-
-
 private:
 	UPROPERTY()
 		int32 CurrentRound;

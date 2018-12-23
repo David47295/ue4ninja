@@ -13,6 +13,7 @@
 #include "NinjaGameStateBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "EngineUtils.h"
+#include "Blueprint/UserWidget.h"
 
 
 
@@ -324,10 +325,9 @@ void ANinjaCharacter::RegisterHit_Implementation()
 					else {
 						ANinjaGameStateBase* GameState = (ANinjaGameStateBase*)GameMode->GetGameState<ANinjaGameStateBase>();
 						if (GameState) {
-							GameState->ShowEndScreen();
+							ShowEndScreen();
 						}
 					}
-					
 				}
 			}
 		}
@@ -337,4 +337,29 @@ void ANinjaCharacter::RegisterHit_Implementation()
 bool ANinjaCharacter::RegisterHit_Validate()
 {
 	return true;
+}
+
+
+void ANinjaCharacter::ShowEndScreen_Implementation()
+{
+	UWorld* World = GetWorld();
+	if (World) {
+		ANinjaGameStateBase* GameState = (ANinjaGameStateBase*)World->GetGameState();
+		APlayerController* Cont = UGameplayStatics::GetPlayerController(World, 0);
+		if (GameState) {
+			if (Cont) {
+				UUserWidget* Screen = CreateWidget<UUserWidget>(Cont, GameState->EndScreenWidget);
+				if (Screen) {
+					FInputModeGameAndUI Mode;
+					Mode.SetLockMouseToViewportBehavior(EMouseLockMode::LockOnCapture);
+					Mode.SetHideCursorDuringCapture(false);
+					Cont->SetInputMode(Mode);
+					Cont->bShowMouseCursor = true;
+					Screen->AddToViewport(99);
+				}
+			}
+		}
+	}
+
+	
 }

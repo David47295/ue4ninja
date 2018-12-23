@@ -117,6 +117,9 @@ protected:
 	UFUNCTION(Client, Unreliable)
 		void Client_SetAttackDashDir();
 
+	UFUNCTION(NetMulticast, Reliable)
+		void ShowEndScreen();
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animations")
 		UPaperFlipbook* IdleAnimFlipbook;
