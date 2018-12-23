@@ -15,6 +15,7 @@
 #include "EngineUtils.h"
 
 
+
 #define CAMERA_ARM_LENGTH 500.f
 #define WORLD_FREEZE_TIME_SCALE 1.f
 #define WORLD_REAL_TIME_SCALE 1.f
@@ -292,6 +293,7 @@ void ANinjaCharacter::Server_HandleAttack_Implementation()
 		ANinjaCharacter* Target = (ANinjaCharacter*)Actors.GetData();
 		if (Target) {
 			//AttackHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			AttackHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			RegisterHit();
 		}
 	}
@@ -314,7 +316,18 @@ void ANinjaCharacter::RegisterHit_Implementation()
 				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("Score: %f"), PS->Score));
 				ANinjaGameModeBase* GameMode = (ANinjaGameModeBase*)World->GetAuthGameMode();
 				if (GameMode) {
-					GameMode->BeginRound();
+					int32 Round = GameMode->GetCurrentRound();
+					if (Round < GameMode->RoundLimit) {
+						GameMode->SetCurrentRound(Round + 1);
+						GameMode->BeginRound();
+					}
+					else {
+						ANinjaGameStateBase* GameState = (ANinjaGameStateBase*)GameMode->GetGameState<ANinjaGameStateBase>();
+						if (GameState) {
+							GameState->ShowEndScreen();
+						}
+					}
+					
 				}
 			}
 		}

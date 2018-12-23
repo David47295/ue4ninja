@@ -4,6 +4,7 @@
 #include "NinjaCharacter.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerStart.h"
+#include "Blueprint/UserWidget.h"
 #include "NinjaPlayerState.h"
 #include "NinjaGameStateBase.h"
 #include "Kismet/GameplayStatics.h"
@@ -131,6 +132,11 @@ void ANinjaGameModeBase::StartActionPhaseTimer(float length)
 int32 ANinjaGameModeBase::GetCurrentRound() const
 {
 	return CurrentRound;
+}
+
+void ANinjaGameModeBase::SetCurrentRound(int32 Round)
+{
+	CurrentRound = Round;
 }
 
 //void ANinjaGameModeBase::PostLogin(APlayerController * NewPlayer)

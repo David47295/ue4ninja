@@ -8,6 +8,7 @@
 
 
 class ANinjaCharacter;
+class UUserWidget;
 /**
  * 
  */
@@ -39,14 +40,26 @@ public:
 	UFUNCTION()
 		void StartActionPhaseTimer(float length);
 
-	UPROPERTY()
+	UPROPERTY(EditDefaultsOnly, Category="Standard Ninja")
 		int32 RoundLimit;
 
 	UFUNCTION()
 		int32 GetCurrentRound() const;
 
+	UFUNCTION()
+		void SetCurrentRound(int32 Round);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ninja Widgets")
+		TSubclassOf<UUserWidget> EndScreenWidget;
+
+	
+
+protected:
+
+
 private:
 	UPROPERTY()
 		int32 CurrentRound;
+
 
 };

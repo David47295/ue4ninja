@@ -17,4 +17,6 @@ public:
 	// 0 for Planning phase. 1 for Action phase
 	int32 GamePhase = 0;
 
+	UFUNCTION(NetMulticast, Unreliable)
+		void ShowEndScreen();
 };
