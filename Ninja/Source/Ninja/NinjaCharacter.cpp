@@ -350,9 +350,8 @@ void ANinjaCharacter::ShowEndScreen_Implementation()
 			if (Cont) {
 				UUserWidget* Screen = CreateWidget<UUserWidget>(Cont, GameState->EndScreenWidget);
 				if (Screen) {
-					FInputModeGameAndUI Mode;
+					FInputModeUIOnly Mode;
 					Mode.SetLockMouseToViewportBehavior(EMouseLockMode::LockOnCapture);
-					Mode.SetHideCursorDuringCapture(false);
 					Cont->SetInputMode(Mode);
 					Cont->bShowMouseCursor = true;
 					Screen->AddToViewport(99);
