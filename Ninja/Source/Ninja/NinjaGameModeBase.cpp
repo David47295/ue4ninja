@@ -128,6 +128,11 @@ void ANinjaGameModeBase::StartActionPhaseTimer(float length)
 	}
 }
 
+int32 ANinjaGameModeBase::GetCurrentRound() const
+{
+	return CurrentRound;
+}
+
 //void ANinjaGameModeBase::PostLogin(APlayerController * NewPlayer)
 //{
 //	if (GetNumPlayers() == 2) {

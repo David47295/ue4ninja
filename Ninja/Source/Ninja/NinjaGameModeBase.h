@@ -42,4 +42,11 @@ public:
 	UPROPERTY()
 		int32 RoundLimit;
 
+	UFUNCTION()
+		int32 GetCurrentRound() const;
+
+private:
+	UPROPERTY()
+		int32 CurrentRound;
+
 };
