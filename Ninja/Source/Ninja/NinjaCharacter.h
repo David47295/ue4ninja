@@ -25,6 +25,9 @@ public:
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&OutLifetimeProps) const override;
 
+	UFUNCTION(Server, unreliable, WithValidation)
+		void SetWorldTime_Server(float scale);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -56,9 +59,16 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Ninja Movement")
 		virtual void SetIsMoving(float Value);
 	
+	/**
+	Set bIsMoving on the server. Sets to true if Value != 0 and false otherwise
+	@param Value the MoveRight axis value of the controller
+	*/
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "Ninja Movement")
 		virtual void ServerSetIsMoving(float Value);
 
+	/**
+	Sets Rotation of Sprite to face either left or right
+	*/
 	virtual void SetSpriteRotation();
 
 	UFUNCTION(Server, unreliable, WithValidation, Category="Ninja Movement")
@@ -88,7 +98,6 @@ protected:
 
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category="Ninja Movement")
 		bool bIsMoving;
-	//virtual bool AttackConnected();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ninja Attacking")
 		int32 GrndAttackStartFrame;
@@ -113,9 +122,6 @@ protected:
 
 	UFUNCTION()
 		void FreezeTime();
-	
-	UFUNCTION(Client, Unreliable)
-		void Client_SetAttackDashDir();
 
 	UFUNCTION(NetMulticast, Reliable)
 		void ShowEndScreen();
@@ -145,8 +151,5 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	UFUNCTION(Server, unreliable, WithValidation)
-		void SetWorldTime_Server(float scale);
 	
 };

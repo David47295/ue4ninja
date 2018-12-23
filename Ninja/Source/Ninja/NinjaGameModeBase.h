@@ -37,9 +37,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ninja")
 		TSubclassOf<ANinjaCharacter> BPNinjaCharacterClass;
 
-	UFUNCTION()
-		void StartActionPhaseTimer(float length);
-
 	UPROPERTY(EditDefaultsOnly, Category="Standard Ninja")
 		int32 RoundLimit;
 

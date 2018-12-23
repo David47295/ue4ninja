@@ -103,10 +103,7 @@ void ANinjaCharacter::Attack_Implementation() {
 		AttackAnimLength = AttackAnimFlipbook->GetTotalDuration();
 		ANinjaGameModeBase* GameMode = (ANinjaGameModeBase*)World->GetAuthGameMode();
 		if (GameMode) {
-			GameMode->StartActionPhaseTimer(AttackAnimLength);
-			SetWorldTime_Server(WORLD_REAL_TIME_SCALE);
 
-			Client_SetAttackDashDir();
 			UNinjaMovementComponent* CharMov = (UNinjaMovementComponent*)GetCharacterMovement();
 			if (CharMov) {
 				CharMov->Dash();
@@ -114,17 +111,6 @@ void ANinjaCharacter::Attack_Implementation() {
 
 			World->GetTimerManager().SetTimer(GameMode->ActionPhaseTimerHandle, this, &ANinjaCharacter::FreezeTime , AttackAnimLength, false);
 		}
-	}
-}
-
-void ANinjaCharacter::Client_SetAttackDashDir_Implementation()
-{
-	UNinjaMovementComponent* CharMov = (UNinjaMovementComponent*)GetCharacterMovement();
-	if (CharMov) {
-		float right = GetInputAxisValue("MoveRight");
-		//float up = GetInputAxisValue("MoveUp");
-		//CharMov->SetAttackDashDirection();
-		//World->GetTimerManager().SetTimer(GameMode->ActionPhaseTimerHandle, this, &ANinjaCharacter::FreezeTime , AttackAnimLength, false);
 	}
 }
 
@@ -268,18 +254,12 @@ void ANinjaCharacter::HandleAttack()
 {
 	if (bIsAttacking) {
 		if (Sprite) {
-			int32 AnimLength = Sprite->GetFlipbookLengthInFrames();
-			AttackCurrFrame = Sprite->GetPlaybackPositionInFrames();
-			//if (GrndAttackStartFrame <= AttackCurrFrame && AttackCurrFrame <= GrndAttackEndFrame) {
-				//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, FString::Printf(TEXT("Frame: %d"), CurrFrame));
-				TArray<AActor*> Actors = TArray<AActor*>();
-				AttackHitbox->GetOverlappingActors(Actors, ACharacter::StaticClass());
-				ANinjaCharacter* Target = (ANinjaCharacter*)Actors.GetData();
-				if (Target) {
-					Server_HandleAttack();
-
-				}
-			//}
+			TArray<AActor*> Actors = TArray<AActor*>();
+			AttackHitbox->GetOverlappingActors(Actors, ACharacter::StaticClass());
+			ANinjaCharacter* Target = (ANinjaCharacter*)Actors.GetData();
+			if (Target) {
+				Server_HandleAttack();
+			}
 		}
 
 	}
@@ -314,11 +294,11 @@ void ANinjaCharacter::RegisterHit_Implementation()
 			ANinjaPlayerState* PS = (ANinjaPlayerState*)Controller->PlayerState;
 			if (PS) {
 				PS->Score++;
-				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("Score: %f"), PS->Score));
+				//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("Score: %f"), PS->Score));
 				ANinjaGameModeBase* GameMode = (ANinjaGameModeBase*)World->GetAuthGameMode();
 				if (GameMode) {
 					int32 Round = GameMode->GetCurrentRound();
-					if (Round < GameMode->RoundLimit) {
+					if (Round < GameMode->RoundLimit - 1) {
 						GameMode->SetCurrentRound(Round + 1);
 						GameMode->BeginRound();
 					}

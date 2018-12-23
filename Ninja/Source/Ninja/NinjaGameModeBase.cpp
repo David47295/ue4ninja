@@ -121,14 +121,6 @@ void ANinjaGameModeBase::EndTurn()
 	}
 }
 
-void ANinjaGameModeBase::StartActionPhaseTimer(float length)
-{
-	UWorld* World = GetWorld();
-	if (World) {
-		World->GetTimerManager().SetTimer(ActionPhaseTimerHandle, this, &ANinjaGameModeBase::EndTurn, length, false);
-	}
-}
-
 int32 ANinjaGameModeBase::GetCurrentRound() const
 {
 	return CurrentRound;
@@ -139,9 +131,3 @@ void ANinjaGameModeBase::SetCurrentRound(int32 Round)
 	CurrentRound = Round;
 }
 
-//void ANinjaGameModeBase::PostLogin(APlayerController * NewPlayer)
-//{
-//	if (GetNumPlayers() == 2) {
-//		
-//	}
-//}
