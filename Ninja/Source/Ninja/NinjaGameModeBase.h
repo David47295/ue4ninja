@@ -39,7 +39,7 @@ public:
 	UFUNCTION()
 		void StartActionPhaseTimer(float length);
 
-	//UFUNCTION()
-	//	virtual void PostLogin(APlayerController* NewPlayer) override;
+	UPROPERTY()
+		int32 RoundLimit;
 
 };
