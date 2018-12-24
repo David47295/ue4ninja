@@ -14,9 +14,14 @@ class NINJA_API ANinjaGameStateBase : public AGameStateBase
 {
 	GENERATED_BODY()
 public:
+
 	// 0 for Planning phase. 1 for Action phase
 	int32 GamePhase = 0;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ninja Widgets")
 		TSubclassOf<UUserWidget> EndScreenWidget;
+
+protected:
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, category="Ninja Lobby")
+		void AllClientsRemoveAllWidgets();
 };
