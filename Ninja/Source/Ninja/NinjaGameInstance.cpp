@@ -2,6 +2,11 @@
 
 #include "NinjaGameInstance.h"
 
+int32 UNinjaGameInstance::GetNumRounds() const
+{
+	return NumRounds;
+}
 
-
-
+void UNinjaGameInstance::SetNumRounds(int32 Num) {
+	NumRounds = Num;
+}

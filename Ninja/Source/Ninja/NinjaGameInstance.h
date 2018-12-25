@@ -13,8 +13,16 @@ UCLASS()
 class NINJA_API UNinjaGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "Ninja Instance")
+		void SetNumRounds(int32 Num);
+
+	UFUNCTION(BlueprintCallable, Category="Ninja Instance")
+		int32 GetNumRounds() const;
 	
-	
+private:
+	int32 NumRounds;
 	
 	
 };
