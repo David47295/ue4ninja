@@ -19,6 +19,9 @@ class NINJA_API ANinjaGameModeBase : public AGameModeBase
 public:
 	ANinjaGameModeBase();
 
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
 	UFUNCTION(BlueprintCallable, Category="Ninja")
 		void BeginRound();
 

@@ -21,7 +21,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Ninja Widgets")
 		TSubclassOf<UUserWidget> EndScreenWidget;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Ninja Widgets")
+		TSubclassOf<UUserWidget> ScoreBoardWidget;
+
 protected:
-	UFUNCTION(NetMulticast, Reliable, BlueprintCallable, category="Ninja Lobby")
-		void AllClientsRemoveAllWidgets();
+
 };

@@ -9,10 +9,19 @@
 #include "NinjaGameStateBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "ConstructorHelpers.h"
+#include "NinjaGameInstance.h"
 
 
 ANinjaGameModeBase::ANinjaGameModeBase() {
-	//DefaultPawnClass = ANinjaCharacter::StaticClass();
+
+}
+
+void ANinjaGameModeBase::BeginPlay()
+{
+	UNinjaGameInstance* GameInst = (UNinjaGameInstance*)GetGameInstance();
+	if (GameInst) {
+		RoundLimit = GameInst->GetNumRounds();
+	}
 }
 
 void ANinjaGameModeBase::BeginRound()
