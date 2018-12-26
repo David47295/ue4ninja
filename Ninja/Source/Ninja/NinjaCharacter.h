@@ -142,6 +142,9 @@ protected:
 	UFUNCTION()
 		void HandleAnimations();
 
+	UFUNCTION(Server, Unreliable, WithValidation)
+		void Server_HandleAnimations();
+
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "Debug")
 		bool bIsAttacking;
 

@@ -64,7 +64,7 @@ void ANinjaCharacter::Tick(float DeltaTime)
 	SetSpriteRotation();
 	SetAttackHitboxLocation(right);
 	HandleAttack();
-	HandleAnimations();
+	//HandleAnimations();
 
 }
 
@@ -95,6 +95,17 @@ void ANinjaCharacter::HandleAnimations()
 		}
 	}
 }
+
+void ANinjaCharacter::Server_HandleAnimations_Implementation()
+{
+
+}
+
+bool ANinjaCharacter::Server_HandleAnimations_Validate()
+{
+	return true;
+}
+
 
 void ANinjaCharacter::Attack_Implementation() {
 	UWorld* World = GetWorld();
