@@ -61,10 +61,10 @@ void ANinjaCharacter::Tick(float DeltaTime)
 {
 	float right = GetInputAxisValue("MoveRight");
 	Super::Tick(DeltaTime);
-	SetSpriteRotation();
-	SetAttackHitboxLocation(right);
+	//SetSpriteRotation();
+	//SetAttackHitboxLocation(right);
 	HandleAttack();
-	//HandleAnimations();
+	HandleAnimations();
 
 }
 
@@ -82,6 +82,8 @@ void ANinjaCharacter::MoveRight(float Value) {
 
 void ANinjaCharacter::HandleAnimations()
 {
+	SetSpriteRotation();
+
 	UCharacterMovementComponent* CharMov = GetCharacterMovement();
 	if (CharMov) {
 		if (!CharMov->IsFalling() && !bIsAttacking) {

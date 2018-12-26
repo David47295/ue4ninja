@@ -25,6 +25,7 @@ void UNinjaMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVecto
 	if (PawnOwner->IsLocallyControlled()) {
 		MoveDirection = PawnOwner->GetLastMovementInputVector();
 		AirJumpDirection = MoveDirection * 600.f + FVector(0.f, 0.f, 500.f);
+		SetAirJumpDirection();
 		if (!bWantsToDash) {
 			SetAttackDashDirection(MoveDirection * AttackDashPower);
 		}
@@ -32,18 +33,25 @@ void UNinjaMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVecto
 
 	if (PawnOwner->Role < ROLE_Authority) {
 		ServerSetMoveDirection(MoveDirection);
-		ServerSetAirJumpDirection(MoveDirection * 600.f + FVector(0.f, 0.f, 500.f));
-		ServerSetAttackDashDirection(AttackDashDirection);
+		//ServerSetAirJumpDirection(MoveDirection * 600.f + FVector(0.f, 0.f, 500.f));
+		//ServerSetAttackDashDirection(AttackDashDirection);
 
 	}
 
-	SetAirJumpDirection();
+	
 
 	DoDash();
 }
 
 void UNinjaMovementComponent::ServerSetMoveDirection_Implementation(const FVector & Dir) {
 	MoveDirection = Dir;
+
+	AirJumpDirection = MoveDirection * 600.f + FVector(0.f, 0.f, 500.f);
+
+	if (!bWantsToDash) {
+		AttackDashDirection = MoveDirection * AttackDashPower;
+	}
+	
 }
 
 bool UNinjaMovementComponent::ServerSetMoveDirection_Validate(const FVector & Dir) {
@@ -92,10 +100,10 @@ void UNinjaMovementComponent::DoDash()
 	ANinjaCharacter* Char = (ANinjaCharacter*)PawnOwner;
 	if (bWantsToDash && AttackDashDirection != FVector::ZeroVector) {
 		Velocity = AttackDashDirection;
-	}
 
-	if (PawnOwner->IsLocallyControlled()) {
-		ServerDoDash();
+		if (PawnOwner->IsLocallyControlled()) {
+			ServerDoDash();
+		}
 	}
 }
 
