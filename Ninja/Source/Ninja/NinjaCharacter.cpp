@@ -65,11 +65,7 @@ bool ANinjaCharacter::IsFlipbookPlaying(UPaperFlipbook * Flipbook) const
 void ANinjaCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	//SetAttackHitboxLocation(right);
 	HandleAttack();
-	//HandleAnimations();
-
-
 }
 
 // Called to bind functionality to input
@@ -82,6 +78,7 @@ void ANinjaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 void ANinjaCharacter::MoveRight(float AxisValue) {
 	AddMovementInput(GetActorRightVector(), AxisValue);
 	HandleAnimations();
+	SetAttackHitboxLocation(AxisValue);
 }
 
 
@@ -97,9 +94,10 @@ void ANinjaCharacter::Server_HandleAnimations_Implementation(float Dir)
 	UCharacterMovementComponent* CharMov = GetCharacterMovement();
 	if (CharMov) {
 		ServerSetSpriteRotation(Dir);
+
 		if (!CharMov->IsFalling() && !bIsAttacking) {
-			if (Dir != 0.f && !IsFlipbookPlaying(WalkAnimFlipbook)) {
-				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("Walking")));
+			if (Dir != 0.f && !IsFlipbookPlaying(JumpAnimFlipbook)) {
+				//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("Walking")));
 				Sprite->SetFlipbook(WalkAnimFlipbook);
 			} else if (Dir == 0.f) {
 				Sprite->SetFlipbook(IdleAnimFlipbook);
