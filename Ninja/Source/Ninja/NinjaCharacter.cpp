@@ -33,7 +33,7 @@ ANinjaCharacter::ANinjaCharacter(const FObjectInitializer& ObjectInitializer)
 	CameraBoom->TargetArmLength = CAMERA_ARM_LENGTH;
 	AttackHitbox = CreateDefaultSubobject<UBoxComponent>(TEXT("AttackHitbox"));
 	AttackHitbox->RelativeLocation = AttackHitboxLocation;
-	AttackHitbox->bHiddenInGame = false;
+	//AttackHitbox->bHiddenInGame = false;
 	AttackHitbox->SetupAttachment(RootComponent);
 	MainCamera->SetupAttachment(CameraBoom);
 	Sprite = CreateDefaultSubobject<UPaperFlipbookComponent>(TEXT("Sprite"));
@@ -179,27 +179,6 @@ void ANinjaCharacter::FreezeTime()
 	
 	SetWorldTime(WORLD_FREEZE_TIME_SCALE);
 	
-}
-
-void ANinjaCharacter::SetIsMoving(float Value)
-{
-	APlayerController* PC = (APlayerController*)GetController();
-	if (Role < ROLE_Authority && PC && PC->IsLocalController()) {
-		//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, TEXT("Running Server code"));
-		ServerSetIsMoving(Value);
-	}
-
-	bIsMoving = Value != 0.f;
-}
-
-void ANinjaCharacter::ServerSetIsMoving_Implementation(float Value)
-{
-	SetIsMoving(Value);
-}
-
-bool ANinjaCharacter::ServerSetIsMoving_Validate(float Value)
-{
-	return (-1.f <= Value && Value <= 1.f);
 }
 
 void ANinjaCharacter::SetSpriteRotation()

@@ -53,20 +53,6 @@ protected:
 		virtual void Attack();
 
 	/**
-	Set bIsMoving. Sets to true if Value != 0 and false otherwise
-	@param Value the MoveRight axis value of the controller
-	*/
-	UFUNCTION(BlueprintCallable, Category = "Ninja Movement")
-		virtual void SetIsMoving(float Value);
-	
-	/**
-	Set bIsMoving on the server. Sets to true if Value != 0 and false otherwise
-	@param Value the MoveRight axis value of the controller
-	*/
-	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "Ninja Movement")
-		virtual void ServerSetIsMoving(float Value);
-
-	/**
 	Sets Rotation of Sprite to face either left or right
 	*/
 	virtual void SetSpriteRotation();
