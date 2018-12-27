@@ -56,15 +56,19 @@ void ANinjaCharacter::BeginPlay()
 	Sprite->SetFlipbook(IdleAnimFlipbook);
 }
 
+bool ANinjaCharacter::IsFlipbookPlaying(UPaperFlipbook * Flipbook) const
+{
+	return Sprite->GetFlipbook() == Flipbook;
+}
+
 // Called every frame
 void ANinjaCharacter::Tick(float DeltaTime)
 {
-	float right = GetInputAxisValue("MoveRight");
 	Super::Tick(DeltaTime);
-	//SetSpriteRotation();
 	//SetAttackHitboxLocation(right);
 	HandleAttack();
-	HandleAnimations();
+	//HandleAnimations();
+
 
 }
 
@@ -72,38 +76,40 @@ void ANinjaCharacter::Tick(float DeltaTime)
 void ANinjaCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	
+	PlayerInputComponent->BindAxis("MoveRight", this, &ANinjaCharacter::MoveRight);
 }
 
-void ANinjaCharacter::MoveRight(float Value) {
-	AddMovementInput(GetActorRightVector(), Value);
+void ANinjaCharacter::MoveRight(float AxisValue) {
+	AddMovementInput(GetActorRightVector(), AxisValue);
+	HandleAnimations();
 }
 
 
 void ANinjaCharacter::HandleAnimations()
 {
-	SetSpriteRotation();
+	float right = GetInputAxisValue("MoveRight");
+	Server_HandleAnimations(right);
+}
 
+void ANinjaCharacter::Server_HandleAnimations_Implementation(float Dir)
+{
+	
 	UCharacterMovementComponent* CharMov = GetCharacterMovement();
 	if (CharMov) {
+		ServerSetSpriteRotation(Dir);
 		if (!CharMov->IsFalling() && !bIsAttacking) {
-			float right = GetInputAxisValue("MoveRight");
-			if (right != 0.f) {
+			if (Dir != 0.f && !IsFlipbookPlaying(WalkAnimFlipbook)) {
+				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("Walking")));
 				Sprite->SetFlipbook(WalkAnimFlipbook);
-			}
-			else {
+			} else if (Dir == 0.f) {
 				Sprite->SetFlipbook(IdleAnimFlipbook);
 			}
 		}
+		 
 	}
 }
 
-void ANinjaCharacter::Server_HandleAnimations_Implementation()
-{
-
-}
-
-bool ANinjaCharacter::Server_HandleAnimations_Validate()
+bool ANinjaCharacter::Server_HandleAnimations_Validate(float Dir)
 {
 	return true;
 }

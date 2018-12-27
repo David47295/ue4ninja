@@ -33,7 +33,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable, Category = "NinjaMovement")
-		virtual void MoveRight(float Value);
+		virtual void MoveRight(float AxisValue);
 
 	UCameraComponent* MainCamera;
 
@@ -139,14 +139,17 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animations")
 		UPaperFlipbook* AttackAnimFlipbook;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 		void HandleAnimations();
 
-	UFUNCTION(Server, Unreliable, WithValidation)
-		void Server_HandleAnimations();
+	UFUNCTION(Server, unreliable, WithValidation)
+		void Server_HandleAnimations(float Dir);
 
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadOnly, Category = "Debug")
 		bool bIsAttacking;
+
+	UFUNCTION()
+		bool IsFlipbookPlaying(UPaperFlipbook* Flipbook) const;
 
 public:	
 	// Called every frame
