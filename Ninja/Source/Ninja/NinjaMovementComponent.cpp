@@ -33,12 +33,8 @@ void UNinjaMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVecto
 
 	if (PawnOwner->Role < ROLE_Authority) {
 		ServerSetMoveDirection(MoveDirection);
-		//ServerSetAirJumpDirection(MoveDirection * 600.f + FVector(0.f, 0.f, 500.f));
-		//ServerSetAttackDashDirection(AttackDashDirection);
 
 	}
-
-	
 
 	DoDash();
 }
@@ -107,13 +103,15 @@ void UNinjaMovementComponent::DoDash()
 	}
 }
 
+void UNinjaMovementComponent::DoDodge()
+{
+}
+
 void UNinjaMovementComponent::ServerDoDash_Implementation()
 {
 	ANinjaCharacter* Char = (ANinjaCharacter*)PawnOwner;
 	if (bWantsToDash && AttackDashDirection != FVector::ZeroVector) {
-		//Velocity = AttackDashDirection;
 		Launch(AttackDashDirection);
-		//bWantsToDash = false;
 	}
 }
 
@@ -125,6 +123,10 @@ bool UNinjaMovementComponent::ServerDoDash_Validate()
 void UNinjaMovementComponent::Dash()
 {
 	bWantsToDash = true;
+}
+
+void UNinjaMovementComponent::Dodge()
+{
 }
 
 void UNinjaMovementComponent::StopDash()
@@ -149,6 +151,13 @@ FNetworkPredictionData_Client* UNinjaMovementComponent::GetPredictionData_Client
 		return ClientPredictionData;
 	}
 	return nullptr;
+}
+
+void UNinjaMovementComponent::UpdateFromCompressedFlags(uint8 Flags)
+{
+	Super::UpdateFromCompressedFlags(Flags);
+
+	bWantsToDodge = (Flags&FSavedMove_Character::FLAG_Custom_0) != 0;
 }
 
 void FSavedMove_Ninja::Clear()
@@ -180,6 +189,7 @@ void FSavedMove_Ninja::SetMoveFor(ACharacter * Character, float InDeltaTime, FVe
 	if (CharMov) {
 		SavedAirJumpDirection = CharMov->AirJumpDirection;
 		SavedAttackDashDirection = CharMov->AttackDashDirection;
+		bSavedWantsToDodge = CharMov->bWantsToDodge;
 	}
 }
 
@@ -190,6 +200,7 @@ void FSavedMove_Ninja::PrepMoveFor(ACharacter * Character)
 	if (CharMov) {
 		CharMov->AirJumpDirection = SavedAirJumpDirection;
 		CharMov->AttackDashDirection = SavedAttackDashDirection;
+		CharMov->bWantsToDodge = bSavedWantsToDodge;
 	}
 }
 

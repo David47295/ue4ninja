@@ -29,6 +29,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Ninja Attacking")
 		uint8 bWantsToDash : 1;
 
+	UPROPERTY()
+		uint8 bWantsToDodge : 1;
+
 	void SetAirJumpDirection();
 
 	UFUNCTION(Server, Unreliable, WithValidation, Category = "Ninja Attacking")
@@ -49,9 +52,14 @@ public:
 		void Dash();
 
 	UFUNCTION()
+		void Dodge();
+
+	UFUNCTION()
 		void StopDash();
 
 	virtual class FNetworkPredictionData_Client* GetPredictionData_Client() const override;
+
+	virtual void UpdateFromCompressedFlags(uint8 Flags) override;
 
 private:
 	UFUNCTION()
@@ -59,6 +67,9 @@ private:
 
 	UFUNCTION(Server, Unreliable, WithValidation)
 		void ServerDoDash();
+
+	UFUNCTION()
+		void DoDodge();
 
 };
 
@@ -70,6 +81,8 @@ public:
 	FVector SavedAirJumpDirection;
 
 	uint8 bSavedWantsToDash : 1;
+
+	uint8 bSavedWantsToDodge : 1;
 
 	typedef FSavedMove_Character Super;
 
