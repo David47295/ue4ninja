@@ -44,7 +44,7 @@ ANinjaCharacter::ANinjaCharacter(const FObjectInitializer& ObjectInitializer)
 void ANinjaCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(ANinjaCharacter, bIsMoving);
+	DOREPLIFETIME(ANinjaCharacter, bIsAttacking);
 
 }
 
@@ -65,7 +65,7 @@ bool ANinjaCharacter::IsFlipbookPlaying(UPaperFlipbook * Flipbook) const
 void ANinjaCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	HandleAttack();
+	//HandleAttack();
 }
 
 // Called to bind functionality to input
