@@ -27,6 +27,8 @@ public:
 
 	UFUNCTION(Server, unreliable, WithValidation)
 		void SetWorldTime_Server(float scale);
+	
+	FTimerHandle GetDodgeTimerHandle() const;
 
 protected:
 	// Called when the game starts or when spawned
@@ -49,8 +51,16 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Ninja Sprite")
 		UPaperFlipbookComponent* Sprite;
 
+	FTimerHandle DodgeTimerHandle;
+
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category="Ninja Attacking")
 		virtual void Attack();
+
+	UFUNCTION(BlueprintCallable, Category = "Ninja Dodge")
+		virtual void Dodge();
+
+	UFUNCTION(BlueprintCallable, Category = "Ninja Dodge")
+		virtual void StopDodge();
 
 	/**
 	Sets Rotation of Sprite to face either left or right
@@ -78,6 +88,9 @@ protected:
 		float AttackAnimTimer;
 
 	float DashAttackSpeed;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ninja Dodge")
+		float DodgeDuration;
 
 	UPROPERTY(Visibleanywhere, BlueprintReadOnly, Category="Debug")
 		int32 AttackCurrFrame = 0;
@@ -136,6 +149,10 @@ protected:
 
 	UFUNCTION()
 		bool IsFlipbookPlaying(UPaperFlipbook* Flipbook) const;
+
+private:
+	UFUNCTION(Server, reliable, WithValidation)
+		void KillVelocity();
 
 public:	
 	// Called every frame

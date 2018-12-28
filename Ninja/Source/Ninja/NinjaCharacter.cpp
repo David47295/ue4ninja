@@ -48,6 +48,11 @@ void ANinjaCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
 }
 
+FTimerHandle ANinjaCharacter::GetDodgeTimerHandle() const
+{
+	return DodgeTimerHandle;
+}
+
 // Called when the game starts or when spawned
 void ANinjaCharacter::BeginPlay()
 {
@@ -60,6 +65,7 @@ bool ANinjaCharacter::IsFlipbookPlaying(UPaperFlipbook * Flipbook) const
 {
 	return Sprite->GetFlipbook() == Flipbook;
 }
+
 
 // Called every frame
 void ANinjaCharacter::Tick(float DeltaTime)
@@ -180,6 +186,45 @@ void ANinjaCharacter::FreezeTime()
 	SetWorldTime(WORLD_FREEZE_TIME_SCALE);
 	
 }
+
+void ANinjaCharacter::Dodge()
+{
+	UWorld* World = GetWorld();
+	if (World) {
+		UNinjaMovementComponent * CharMov = (UNinjaMovementComponent*)GetCharacterMovement();
+		if (CharMov) {
+			CharMov->Dodge();
+			//World->GetTimerManager().SetTimer(DodgeTimerHandle, this, &ANinjaCharacter::StopDodge, DodgeDuration, false);
+
+		}
+	}
+}
+
+void ANinjaCharacter::StopDodge()
+{
+	UWorld* World = GetWorld();
+	if (World) {
+		UNinjaMovementComponent * CharMov = (UNinjaMovementComponent*)GetCharacterMovement();
+		if (CharMov) {
+			CharMov->StopDodge();
+			
+		}
+	}
+}
+
+void ANinjaCharacter::KillVelocity_Implementation()
+{
+	UNinjaMovementComponent * CharMov = (UNinjaMovementComponent*)GetCharacterMovement();
+	if (CharMov) {
+		CharMov->Velocity = FVector::ZeroVector;
+	}
+}
+
+bool ANinjaCharacter::KillVelocity_Validate()
+{
+	return true;
+}
+
 
 void ANinjaCharacter::SetSpriteRotation()
 {

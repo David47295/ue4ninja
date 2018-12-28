@@ -4,7 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/TimelineComponent.h"
 #include "NinjaMovementComponent.generated.h"
+
+
+
 
 /**
  * 
@@ -23,6 +27,12 @@ public:
 
 	FVector AirJumpDirection;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		float DodgeTimelineValue;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Ninja Dodge")
+		FVector DodgeDirection;
+
 	UPROPERTY(BlueprintReadOnly, Category = "Ninja Attacking")
 		FVector AttackDashDirection;
 
@@ -31,6 +41,9 @@ public:
 
 	UPROPERTY()
 		uint8 bWantsToDodge : 1;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ninja Dodge")
+		float DodgePower;
 
 	void SetAirJumpDirection();
 
@@ -57,6 +70,17 @@ public:
 	UFUNCTION()
 		void StopDash();
 
+	UFUNCTION()
+		void StopDodge();
+
+	UPROPERTY(EditAnywhere)
+		UCurveFloat* DodgeSpeedCurve;
+
+	FTimeline DodgeTimeline;
+
+	UFUNCTION(Server, unreliable, WithValidation)
+		void Server_SetDodgeTimelineValue(float Value);
+
 	virtual class FNetworkPredictionData_Client* GetPredictionData_Client() const override;
 
 	virtual void UpdateFromCompressedFlags(uint8 Flags) override;
@@ -71,6 +95,9 @@ private:
 	UFUNCTION()
 		void DoDodge();
 
+	UFUNCTION(Server, Reliable, WithValidation)
+		void StartDodgeTimeline();
+
 };
 
 class FSavedMove_Ninja : public FSavedMove_Character
@@ -83,6 +110,8 @@ public:
 	uint8 bSavedWantsToDash : 1;
 
 	uint8 bSavedWantsToDodge : 1;
+
+	float SavedDodgeTimelineValue;
 
 	typedef FSavedMove_Character Super;
 
