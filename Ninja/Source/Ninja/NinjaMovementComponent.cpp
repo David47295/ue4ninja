@@ -159,28 +159,12 @@ void UNinjaMovementComponent::Dodge()
 
 	FOnTimelineFloat TimelineCallback;
 	FOnTimelineEventStatic OnTimelineFinished;
-	//TimelineCallback.BindUFunction(this, FName("DoDodge"));
 	OnTimelineFinished.BindUFunction(this, FName{ TEXT("StopDodge") });
 
 	DodgeTimeline.AddInterpFloat(DodgeSpeedCurve, NULL);
 	DodgeTimeline.SetTimelineFinishedFunc(OnTimelineFinished);
 	DodgeTimeline.PlayFromStart();
 	
-}
-
-void UNinjaMovementComponent::StartDodgeTimeline_Implementation() {
-	FOnTimelineFloat TimelineCallback;
-	FOnTimelineEventStatic OnTimelineFinished;
-	TimelineCallback.BindUFunction(this, FName("DoDodge"));
-	OnTimelineFinished.BindUFunction(this, FName{ TEXT("StopDodge") });
-
-	DodgeTimeline.AddInterpFloat(DodgeSpeedCurve, TimelineCallback);
-	DodgeTimeline.SetTimelineFinishedFunc(OnTimelineFinished);
-	DodgeTimeline.PlayFromStart();
-}
-
-bool UNinjaMovementComponent::StartDodgeTimeline_Validate() {
-	return true;
 }
 
 void UNinjaMovementComponent::StopDash()

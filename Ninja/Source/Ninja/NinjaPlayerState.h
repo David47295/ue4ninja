@@ -14,18 +14,4 @@ class NINJA_API ANinjaPlayerState : public APlayerState
 {
 	GENERATED_BODY()
 	
-public:
-	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&OutLifetimeProps) const override;
-
-	UPROPERTY(Transient, ReplicatedUsing=OnRep_IsMyTurn)
-		bool bIsMyTurn;
-
-	UFUNCTION(Server, Reliable, WithValidation)
-		void OnRep_IsMyTurn();
-
-	UFUNCTION(BlueprintCallable, Category = "Ninja")
-		bool GetIsMyTurn() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Ninja")
-		void SetIsMyTurn(bool turn);
 };

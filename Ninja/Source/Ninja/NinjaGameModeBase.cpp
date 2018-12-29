@@ -32,7 +32,6 @@ void ANinjaGameModeBase::BeginRound()
 		for (TActorIterator<APlayerController> Itr(World); Itr; ++Itr) {
 			APlayerController* Cont = *Itr;
 			if (Cont) {
-				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, TEXT("Controller"));
 				ACharacter* Character = Cont->GetCharacter();
 				APlayerStart* PS = (APlayerStart*)ChoosePlayerStart(Cont);
 				if (PS) {
@@ -49,15 +48,6 @@ void ANinjaGameModeBase::BeginRound()
 					}
 				}
 
-			}
-		}
-		ANinjaGameStateBase* GS = (ANinjaGameStateBase*)GameState;
-		if (GS) {
-			ANinjaPlayerState* PState = (ANinjaPlayerState*)GS->PlayerArray[0];
-			if (PState) {
-				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, TEXT("Setting IsmyTurn"));
-				GEngine->AddOnScreenDebugMessage(-1, 3, FColor::Blue, FString::Printf(TEXT("Value: %s"), *PState->GetOwner()->GetName()));
-				PState->bIsMyTurn = true;
 			}
 		}
 	}
@@ -92,39 +82,6 @@ void ANinjaGameModeBase::ClearPlayerStartTags() {
 			APlayerStart* Actor = *Itr;
 			if (Actor) {
 				Actor->PlayerStartTag = FName(TEXT("Free"));
-			}
-		}
-	}
-}
-
-void ANinjaGameModeBase::EndTurn()
-{
-	GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, TEXT("Turn Over!"));
-	UWorld* World = GetWorld();
-	if (World) {
-		ANinjaGameStateBase* GS = (ANinjaGameStateBase*)GameState;
-		if (GS) {
-			ANinjaPlayerState* PState = (ANinjaPlayerState*)GS->PlayerArray[ActivePlayerId];
-			if (PState) {
-				PState->bIsMyTurn = false;
-
-				if (ActivePlayerId == 0) {
-					ActivePlayerId = 1;
-				}
-				else {
-					ActivePlayerId = 0;
-				}
-
-				PState = (ANinjaPlayerState*)GS->PlayerArray[ActivePlayerId];
-				PState->bIsMyTurn = true;
-
-				AController* Controller = (AController*)PState->GetOwner();
-				if (Controller) {
-					ANinjaCharacter* Char = (ANinjaCharacter*)Controller->GetPawn();
-					if (Char) {
-						Char->SetWorldTime_Server(1.f);
-					}
-				}
 			}
 		}
 	}

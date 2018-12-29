@@ -30,9 +30,6 @@ public:
 	FTimerHandle ActionPhaseTimerHandle;
 
 	void ClearPlayerStartTags();
-	
-	UFUNCTION(BlueprintCallable, Category = "Ninja Gameflow")
-		void EndTurn();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Ninja Gameflow")
 		int32 ActivePlayerId = 0;

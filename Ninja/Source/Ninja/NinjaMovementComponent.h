@@ -95,9 +95,6 @@ private:
 	UFUNCTION()
 		void DoDodge();
 
-	UFUNCTION(Server, Reliable, WithValidation)
-		void StartDodgeTimeline();
-
 };
 
 class FSavedMove_Ninja : public FSavedMove_Character
