@@ -37,11 +37,6 @@ void UNinjaMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVecto
 		if (bWantsToDodge) {
 			DodgeTimeline.TickTimeline(GetWorld()->GetDeltaSeconds());
 			DodgeTimelineValue = DodgeSpeedCurve->GetFloatValue(DodgeTimeline.GetPlaybackPosition());
-			GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("%f"),DodgeTimelineValue));
-
-			//if (PawnOwner->Role < ROLE_AutonomousProxy) {
-			//	Server_SetDodgeTimelineValue(DodgeTimelineValue);
-			//}
 			//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("%f"),DodgeTimelineValue));
 		}
 	}
@@ -53,8 +48,6 @@ void UNinjaMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVecto
 	}
 
 	DoDash();
-
-
 
 	DoDodge();
 }
@@ -147,9 +140,6 @@ void UNinjaMovementComponent::DoDodge()
 		ANinjaCharacter* Char = (ANinjaCharacter*)PawnOwner;
 		if (Char) {
 			if (bWantsToDodge) {
-				//Velocity = DodgeDirection;
-				//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("%f"),DodgeTimelineValue));
-
 				Velocity = DodgeDirection * DodgeTimelineValue;
 			}
 		}
