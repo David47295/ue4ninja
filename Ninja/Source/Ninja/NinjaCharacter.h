@@ -30,6 +30,13 @@ public:
 	
 	FTimerHandle GetDodgeTimerHandle() const;
 
+	UFUNCTION(Server, reliable, WithValidation)
+		void Server_SetIsDodging(bool Dodging);
+
+	UFUNCTION()
+		void SetIsDodging(bool Dodging);
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -89,9 +96,6 @@ protected:
 
 	float DashAttackSpeed;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ninja Dodge")
-		float DodgeDuration;
-
 	UPROPERTY(Visibleanywhere, BlueprintReadOnly, Category="Debug")
 		int32 AttackCurrFrame = 0;
 
@@ -125,6 +129,9 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 		void ShowEndScreen();
 
+	UPROPERTY(BlueprintReadOnly)
+		bool bIsDodging;
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animations")
 		UPaperFlipbook* IdleAnimFlipbook;
@@ -149,10 +156,6 @@ protected:
 
 	UFUNCTION()
 		bool IsFlipbookPlaying(UPaperFlipbook* Flipbook) const;
-
-private:
-	UFUNCTION(Server, reliable, WithValidation)
-		void KillVelocity();
 
 public:	
 	// Called every frame

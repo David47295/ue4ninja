@@ -175,6 +175,15 @@ void UNinjaMovementComponent::StopDash()
 void UNinjaMovementComponent::StopDodge()
 {
 	bWantsToDodge = false;
+
+	ANinjaCharacter* Char = (ANinjaCharacter*)PawnOwner;
+	if (Char) {
+		Char->SetIsDodging(false);
+		if (PawnOwner->Role == ROLE_AutonomousProxy) {
+			Char->Server_SetIsDodging(false);
+		}
+		
+	}
 }
 
 void UNinjaMovementComponent::Server_SetDodgeTimelineValue_Implementation(float Value)
@@ -185,6 +194,11 @@ void UNinjaMovementComponent::Server_SetDodgeTimelineValue_Implementation(float 
 bool UNinjaMovementComponent::Server_SetDodgeTimelineValue_Validate(float Value)
 {
 	return true;
+}
+
+bool UNinjaMovementComponent::GetWantsToDodge() const
+{
+	return bWantsToDodge;
 }
 
 FNetworkPredictionData_Client* UNinjaMovementComponent::GetPredictionData_Client() const

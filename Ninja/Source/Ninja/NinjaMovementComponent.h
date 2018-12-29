@@ -81,6 +81,9 @@ public:
 	UFUNCTION(Server, unreliable, WithValidation)
 		void Server_SetDodgeTimelineValue(float Value);
 
+	UFUNCTION()
+		bool GetWantsToDodge() const;
+
 	virtual class FNetworkPredictionData_Client* GetPredictionData_Client() const override;
 
 	virtual void UpdateFromCompressedFlags(uint8 Flags) override;

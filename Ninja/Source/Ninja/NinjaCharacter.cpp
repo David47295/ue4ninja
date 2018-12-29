@@ -14,6 +14,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "EngineUtils.h"
 #include "Blueprint/UserWidget.h"
+#include "Kismet/KismetStringLibrary.h"
 
 
 
@@ -51,6 +52,11 @@ void ANinjaCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 FTimerHandle ANinjaCharacter::GetDodgeTimerHandle() const
 {
 	return DodgeTimerHandle;
+}
+
+void ANinjaCharacter::SetIsDodging(bool Dodging)
+{
+	bIsDodging = Dodging;
 }
 
 // Called when the game starts or when spawned
@@ -187,15 +193,26 @@ void ANinjaCharacter::FreezeTime()
 	
 }
 
+void ANinjaCharacter::Server_SetIsDodging_Implementation(bool Dodging)
+{
+	bIsDodging = Dodging;
+}
+
+bool ANinjaCharacter::Server_SetIsDodging_Validate(bool Dodging)
+{
+	return true;
+}
+
 void ANinjaCharacter::Dodge()
 {
 	UWorld* World = GetWorld();
 	if (World) {
 		UNinjaMovementComponent * CharMov = (UNinjaMovementComponent*)GetCharacterMovement();
-		if (CharMov) {
+		if (CharMov && !CharMov->bWantsToDodge) {
 			CharMov->Dodge();
+			bIsDodging = true;
+			Server_SetIsDodging(true);
 			//World->GetTimerManager().SetTimer(DodgeTimerHandle, this, &ANinjaCharacter::StopDodge, DodgeDuration, false);
-
 		}
 	}
 }
@@ -207,22 +224,11 @@ void ANinjaCharacter::StopDodge()
 		UNinjaMovementComponent * CharMov = (UNinjaMovementComponent*)GetCharacterMovement();
 		if (CharMov) {
 			CharMov->StopDodge();
+			bIsDodging = false;
+			Server_SetIsDodging(false);
 			
 		}
 	}
-}
-
-void ANinjaCharacter::KillVelocity_Implementation()
-{
-	UNinjaMovementComponent * CharMov = (UNinjaMovementComponent*)GetCharacterMovement();
-	if (CharMov) {
-		CharMov->Velocity = FVector::ZeroVector;
-	}
-}
-
-bool ANinjaCharacter::KillVelocity_Validate()
-{
-	return true;
 }
 
 
@@ -296,10 +302,20 @@ void ANinjaCharacter::HandleAttack()
 	if (bIsAttacking) {
 		if (Sprite) {
 			TArray<AActor*> Actors = TArray<AActor*>();
-			AttackHitbox->GetOverlappingActors(Actors, ACharacter::StaticClass());
-			ANinjaCharacter* Target = (ANinjaCharacter*)Actors.GetData();
+			AttackHitbox->GetOverlappingActors(Actors, ANinjaCharacter::StaticClass());
+			ANinjaCharacter* Target = (ANinjaCharacter*)Actors[0];
+
 			if (Target) {
-				Server_HandleAttack();
+				if (!Target->bIsDodging) {
+					GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("%d"), Actors.Num()));
+					GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("%s"), *Target->GetName()));
+					GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, UKismetStringLibrary::Conv_BoolToString(Target->bIsDodging));
+					Server_HandleAttack();
+				}
+				else {
+					GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("Missed!")));
+
+				}
 			}
 		}
 
@@ -312,11 +328,16 @@ void ANinjaCharacter::Server_HandleAttack_Implementation()
 	if (bIsAttacking) {
 		TArray<AActor*> Actors = TArray<AActor*>();
 		AttackHitbox->GetOverlappingActors(Actors, ACharacter::StaticClass());
-		ANinjaCharacter* Target = (ANinjaCharacter*)Actors.GetData();
+		ANinjaCharacter* Target = (ANinjaCharacter*)Actors[0];
 		if (Target) {
-			//AttackHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			AttackHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			RegisterHit();
+			if (!Target->bIsDodging) {
+				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("%d"), Actors.Num()));
+				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("%s"), *Target->GetName()));
+				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, UKismetStringLibrary::Conv_BoolToString(Target->bIsDodging));
+
+				AttackHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				RegisterHit();
+			}
 		}
 	}
 }
