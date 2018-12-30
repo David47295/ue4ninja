@@ -66,9 +66,6 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Ninja Dodge")
 		virtual void Dodge();
 
-	UFUNCTION(BlueprintCallable, Category = "Ninja Dodge")
-		virtual void StopDodge();
-
 	/**
 	Sets Rotation of Sprite to face either left or right
 	*/

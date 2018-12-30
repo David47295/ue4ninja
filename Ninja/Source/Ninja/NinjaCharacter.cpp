@@ -211,22 +211,9 @@ void ANinjaCharacter::Dodge()
 		if (CharMov && !CharMov->bWantsToDodge) {
 			CharMov->Dodge();
 			bIsDodging = true;
-			Server_SetIsDodging(true);
-			//World->GetTimerManager().SetTimer(DodgeTimerHandle, this, &ANinjaCharacter::StopDodge, DodgeDuration, false);
-		}
-	}
-}
-
-void ANinjaCharacter::StopDodge()
-{
-	UWorld* World = GetWorld();
-	if (World) {
-		UNinjaMovementComponent * CharMov = (UNinjaMovementComponent*)GetCharacterMovement();
-		if (CharMov) {
-			CharMov->StopDodge();
-			bIsDodging = false;
-			Server_SetIsDodging(false);
-			
+			if (Role == ROLE_AutonomousProxy) {
+				Server_SetIsDodging(true);
+			}
 		}
 	}
 }
