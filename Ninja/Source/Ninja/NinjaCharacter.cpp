@@ -294,14 +294,10 @@ void ANinjaCharacter::HandleAttack()
 
 			if (Target) {
 				if (!Target->bIsDodging) {
-					GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("%d"), Actors.Num()));
+					/*GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("%d"), Actors.Num()));
 					GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("%s"), *Target->GetName()));
-					GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, UKismetStringLibrary::Conv_BoolToString(Target->bIsDodging));
+					GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, UKismetStringLibrary::Conv_BoolToString(Target->bIsDodging));*/
 					Server_HandleAttack();
-				}
-				else {
-					GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("Missed!")));
-
 				}
 			}
 		}
@@ -318,9 +314,9 @@ void ANinjaCharacter::Server_HandleAttack_Implementation()
 		ANinjaCharacter* Target = (ANinjaCharacter*)Actors[0];
 		if (Target) {
 			if (!Target->bIsDodging) {
-				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("%d"), Actors.Num()));
+				/*GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("%d"), Actors.Num()));
 				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("%s"), *Target->GetName()));
-				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, UKismetStringLibrary::Conv_BoolToString(Target->bIsDodging));
+				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, UKismetStringLibrary::Conv_BoolToString(Target->bIsDodging));*/
 
 				AttackHitbox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				RegisterHit();
