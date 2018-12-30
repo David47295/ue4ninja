@@ -77,7 +77,7 @@ bool ANinjaCharacter::IsFlipbookPlaying(UPaperFlipbook * Flipbook) const
 void ANinjaCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	//HandleAttack();
+	HandleAttack();
 }
 
 // Called to bind functionality to input
@@ -281,9 +281,9 @@ void ANinjaCharacter::HandleAttack()
 		if (Sprite) {
 			TArray<AActor*> Actors = TArray<AActor*>();
 			AttackHitbox->GetOverlappingActors(Actors, ANinjaCharacter::StaticClass());
-			ANinjaCharacter* Target = (ANinjaCharacter*)Actors[0];
-
+			
 			if (Actors.Num() > 0) {
+				ANinjaCharacter* Target = (ANinjaCharacter*)Actors[0];
 				if (Target) {
 					if (!Target->bIsDodging) {
 						/*GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("%d"), Actors.Num()));
