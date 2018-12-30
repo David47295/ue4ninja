@@ -138,7 +138,7 @@ void ANinjaCharacter::Attack_Implementation() {
 				CharMov->Dash();
 			}
 
-			World->GetTimerManager().SetTimer(GameMode->ActionPhaseTimerHandle, this, &ANinjaCharacter::FreezeTime , AttackAnimLength, false);
+			World->GetTimerManager().SetTimer(GameMode->ActionPhaseTimerHandle, this, &ANinjaCharacter::StopAttack , AttackAnimLength, false);
 		}
 	}
 }
@@ -173,7 +173,7 @@ void ANinjaCharacter::SetWorldTime(float scale)
 	}
 }
 
-void ANinjaCharacter::FreezeTime()
+void ANinjaCharacter::StopAttack()
 {
 	UNinjaMovementComponent* CharMov = (UNinjaMovementComponent*)GetCharacterMovement();
 	if (CharMov) {
@@ -181,15 +181,6 @@ void ANinjaCharacter::FreezeTime()
 		AttackHitbox->SetActive(false);
 		bIsAttacking = false;
 	}
-
-	if (Role < ROLE_Authority) {
-		SetWorldTime_Server(WORLD_FREEZE_TIME_SCALE);
-	}
-	else {
-		SetWorldTime_Client(WORLD_FREEZE_TIME_SCALE);
-	}
-	
-	SetWorldTime(WORLD_FREEZE_TIME_SCALE);
 	
 }
 
@@ -292,12 +283,14 @@ void ANinjaCharacter::HandleAttack()
 			AttackHitbox->GetOverlappingActors(Actors, ANinjaCharacter::StaticClass());
 			ANinjaCharacter* Target = (ANinjaCharacter*)Actors[0];
 
-			if (Target) {
-				if (!Target->bIsDodging) {
-					/*GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("%d"), Actors.Num()));
-					GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("%s"), *Target->GetName()));
-					GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, UKismetStringLibrary::Conv_BoolToString(Target->bIsDodging));*/
-					Server_HandleAttack();
+			if (Actors.Num() > 0) {
+				if (Target) {
+					if (!Target->bIsDodging) {
+						/*GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("%d"), Actors.Num()));
+						GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("%s"), *Target->GetName()));
+						GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, UKismetStringLibrary::Conv_BoolToString(Target->bIsDodging));*/
+						Server_HandleAttack();
+					}
 				}
 			}
 		}

@@ -63,6 +63,9 @@ protected:
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category="Ninja Attacking")
 		virtual void Attack();
 
+	UFUNCTION()
+		virtual void StopAttack();
+
 	UFUNCTION(BlueprintCallable, Category = "Ninja Dodge")
 		virtual void Dodge();
 
@@ -119,9 +122,6 @@ protected:
 
 	UFUNCTION()
 		void SetWorldTime(float scale);
-
-	UFUNCTION()
-		void FreezeTime();
 
 	UFUNCTION(NetMulticast, Reliable)
 		void ShowEndScreen();
