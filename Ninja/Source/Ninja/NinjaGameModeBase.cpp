@@ -19,7 +19,7 @@ ANinjaGameModeBase::ANinjaGameModeBase() {
 void ANinjaGameModeBase::BeginPlay()
 {
 	UNinjaGameInstance* GameInst = (UNinjaGameInstance*)GetGameInstance();
-	if (GameInst) {
+	if (GameInst && !Debug) {
 		RoundLimit = GameInst->GetNumRounds();
 	}
 }

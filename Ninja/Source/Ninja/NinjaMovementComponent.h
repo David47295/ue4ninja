@@ -39,7 +39,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Ninja Attacking")
 		uint8 bWantsToDash : 1;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 		uint8 bWantsToDodge : 1;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ninja Dodge")

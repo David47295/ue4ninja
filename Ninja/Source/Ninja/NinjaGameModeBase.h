@@ -37,7 +37,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ninja")
 		TSubclassOf<ANinjaCharacter> BPNinjaCharacterClass;
 
-	UPROPERTY(EditDefaultsOnly, Category="Standard Ninja")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Standard Ninja")
 		int32 RoundLimit;
 
 	UFUNCTION()
@@ -46,6 +46,8 @@ public:
 	UFUNCTION()
 		void SetCurrentRound(int32 Round);
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Debug")
+		bool Debug;
 private:
 	UPROPERTY()
 		int32 CurrentRound;
