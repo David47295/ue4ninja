@@ -60,7 +60,9 @@ protected:
 
 	FTimerHandle DodgeTimerHandle;
 
-	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category="Ninja Attacking")
+	FTimerHandle AttackDashTimerHandle;
+
+	UFUNCTION(BlueprintCallable, Category="Ninja Attacking")
 		virtual void Attack();
 
 	UFUNCTION()

@@ -125,26 +125,21 @@ bool ANinjaCharacter::Server_HandleAnimations_Validate(float Dir)
 }
 
 
-void ANinjaCharacter::Attack_Implementation() {
+void ANinjaCharacter::Attack() {
 	UWorld* World = GetWorld();
 	if (World) {
+
 		bIsAttacking = true;
 		AttackAnimLength = AttackAnimFlipbook->GetTotalDuration();
-		ANinjaGameModeBase* GameMode = (ANinjaGameModeBase*)World->GetAuthGameMode();
-		if (GameMode) {
 
-			UNinjaMovementComponent* CharMov = (UNinjaMovementComponent*)GetCharacterMovement();
-			if (CharMov) {
-				CharMov->Dash();
-			}
-
-			World->GetTimerManager().SetTimer(GameMode->ActionPhaseTimerHandle, this, &ANinjaCharacter::StopAttack , AttackAnimLength, false);
+		UNinjaMovementComponent* CharMov = (UNinjaMovementComponent*)GetCharacterMovement();
+		if (CharMov) {
+			GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("AttackDashCooldownTimer = %f"),CharMov->AttackDashCooldownTimer));
+			CharMov->Dash();
 		}
-	}
-}
 
-bool ANinjaCharacter::Attack_Validate() {
-	return true;
+		World->GetTimerManager().SetTimer(AttackDashTimerHandle, this, &ANinjaCharacter::StopAttack , AttackAnimLength, false);
+	}
 }
 
 void ANinjaCharacter::SetWorldTime_Server_Implementation(float scale)

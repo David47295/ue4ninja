@@ -28,6 +28,12 @@ void UNinjaMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVecto
 		SetAirJumpDirection();
 		if (!bWantsToDash) {
 			SetAttackDashDirection(MoveDirection * AttackDashPower);
+
+			UWorld* World = GetWorld();
+			if (World) {
+				AttackDashCooldownTimer -= World->GetDeltaSeconds();
+			}
+
 		}
 
 		if (!bWantsToDodge) {
@@ -37,7 +43,6 @@ void UNinjaMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVecto
 		if (bWantsToDodge) {
 			DodgeTimeline.TickTimeline(GetWorld()->GetDeltaSeconds());
 			DodgeTimelineValue = DodgeSpeedCurve->GetFloatValue(DodgeTimeline.GetPlaybackPosition());
-			//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("%f"),DodgeTimelineValue));
 		}
 	}
 
@@ -114,10 +119,11 @@ void UNinjaMovementComponent::DoDash()
 	if (bWantsToDash && AttackDashDirection != FVector::ZeroVector) {
 		Velocity = AttackDashDirection;
 
-		if (PawnOwner->IsLocallyControlled()) {
-			ServerDoDash();
-		}
+		//if (PawnOwner->IsLocallyControlled()) {
+		//	ServerDoDash();
+		//}
 	}
+
 }
 
 void UNinjaMovementComponent::ServerDoDash_Implementation()
@@ -132,6 +138,15 @@ bool UNinjaMovementComponent::ServerDoDash_Validate()
 {
 	return true;
 }
+
+void UNinjaMovementComponent::SetAttackDashCooldownTimer_Implementation(float Time) {
+
+}
+
+bool UNinjaMovementComponent::SetAttackDashCooldownTimer_Validate(float Time) {
+	return true;
+}
+
 
 void UNinjaMovementComponent::DoDodge()
 {
@@ -150,7 +165,11 @@ void UNinjaMovementComponent::DoDodge()
 
 void UNinjaMovementComponent::Dash()
 {
-	bWantsToDash = true;
+	if (!bWantsToDash) {
+		bWantsToDash = true;
+		AttackDashCooldownTimer = AttackDashCooldown;
+	}
+	
 }
 
 void UNinjaMovementComponent::Dodge()
@@ -225,6 +244,7 @@ void UNinjaMovementComponent::UpdateFromCompressedFlags(uint8 Flags)
 	Super::UpdateFromCompressedFlags(Flags);
 
 	bWantsToDodge = (Flags&FSavedMove_Character::FLAG_Custom_0) != 0;
+	bWantsToDash = (Flags&FSavedMove_Character::FLAG_Custom_0) != 0;
 }
 
 void FSavedMove_Ninja::Clear()
@@ -234,7 +254,9 @@ void FSavedMove_Ninja::Clear()
 	SavedAirJumpDirection = FVector::ZeroVector;
 	SavedAttackDashDirection = FVector::ZeroVector;
 	bSavedWantsToDodge = false;
+	bSavedWantsToDash = false;
 	SavedDodgeTimelineValue = 0.f;
+	SavedAttackDashCooldownTimer = 0.f;
 
 }
 
@@ -243,6 +265,9 @@ uint8 FSavedMove_Ninja::GetCompressedFlags() const
 	uint8 Result = Super::GetCompressedFlags();
 
 	if (bSavedWantsToDodge) {
+		Result |= FLAG_Custom_0;
+	}
+	else if (bSavedWantsToDash) {
 		Result |= FLAG_Custom_0;
 	}
 
@@ -263,7 +288,9 @@ void FSavedMove_Ninja::SetMoveFor(ACharacter * Character, float InDeltaTime, FVe
 		SavedAirJumpDirection = CharMov->AirJumpDirection;
 		SavedAttackDashDirection = CharMov->AttackDashDirection;
 		bSavedWantsToDodge = CharMov->bWantsToDodge;
+		bSavedWantsToDash = CharMov->bWantsToDash;
 		SavedDodgeTimelineValue = CharMov->DodgeTimelineValue;
+		SavedAttackDashCooldownTimer = CharMov->AttackDashCooldownTimer;
 	}
 }
 
@@ -275,7 +302,9 @@ void FSavedMove_Ninja::PrepMoveFor(ACharacter * Character)
 		CharMov->AirJumpDirection = SavedAirJumpDirection;
 		CharMov->AttackDashDirection = SavedAttackDashDirection;
 		CharMov->bWantsToDodge = bSavedWantsToDodge;
+		CharMov->bWantsToDash = bSavedWantsToDash;
 		CharMov->DodgeTimelineValue = SavedDodgeTimelineValue;
+		CharMov->AttackDashCooldownTimer = SavedAttackDashCooldownTimer;
 	}
 }
 

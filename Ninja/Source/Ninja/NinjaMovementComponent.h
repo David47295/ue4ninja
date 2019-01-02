@@ -27,9 +27,11 @@ public:
 
 	FVector AirJumpDirection;
 
-	float AttackDashCooldown;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ninja Attacking")
+		float AttackDashCooldown;
 
-	float AttackDashTimer;
+	UPROPERTY(BlueprintReadOnly, Category = "Ninja Attacking")
+		float AttackDashCooldownTimer;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		float DodgeTimelineValue;
@@ -88,6 +90,9 @@ public:
 	UFUNCTION()
 		bool GetWantsToDodge() const;
 
+	UFUNCTION(Server, Unreliable, WithValidation)
+		void SetAttackDashCooldownTimer(float Time);
+
 	virtual class FNetworkPredictionData_Client* GetPredictionData_Client() const override;
 
 	virtual void UpdateFromCompressedFlags(uint8 Flags) override;
@@ -117,7 +122,7 @@ public:
 
 	float SavedDodgeTimelineValue;
 
-	float SavedAttackDashTimer;
+	float SavedAttackDashCooldownTimer;
 
 	typedef FSavedMove_Character Super;
 
