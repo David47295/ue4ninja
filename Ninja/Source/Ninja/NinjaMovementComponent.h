@@ -27,6 +27,10 @@ public:
 
 	FVector AirJumpDirection;
 
+	float AttackDashCooldown;
+
+	float AttackDashTimer;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		float DodgeTimelineValue;
 
@@ -112,6 +116,8 @@ public:
 	uint8 bSavedWantsToDodge : 1;
 
 	float SavedDodgeTimelineValue;
+
+	float SavedAttackDashTimer;
 
 	typedef FSavedMove_Character Super;
 
