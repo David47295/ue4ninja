@@ -49,7 +49,6 @@ void UNinjaMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVecto
 	if (PawnOwner->Role < ROLE_Authority) {
 		ServerSetMoveDirection(MoveDirection);
 		Server_SetDodgeTimelineValue(DodgeTimelineValue);
-
 	}
 
 	DoDash();
@@ -70,6 +69,11 @@ void UNinjaMovementComponent::ServerSetMoveDirection_Implementation(const FVecto
 		DodgeDirection = MoveDirection * DodgePower;
 	}
 	
+	UWorld* World = GetWorld();
+	if (World) {
+		AttackDashCooldownTimer -= World->GetDeltaSeconds();
+	}
+
 }
 
 bool UNinjaMovementComponent::ServerSetMoveDirection_Validate(const FVector & Dir) {
@@ -119,9 +123,6 @@ void UNinjaMovementComponent::DoDash()
 	if (bWantsToDash && AttackDashDirection != FVector::ZeroVector) {
 		Velocity = AttackDashDirection;
 
-		//if (PawnOwner->IsLocallyControlled()) {
-		//	ServerDoDash();
-		//}
 	}
 
 }
@@ -139,11 +140,11 @@ bool UNinjaMovementComponent::ServerDoDash_Validate()
 	return true;
 }
 
-void UNinjaMovementComponent::SetAttackDashCooldownTimer_Implementation(float Time) {
-
+void UNinjaMovementComponent::Server_SetAttackDashCooldownTimer_Implementation(float Time) {
+	AttackDashCooldownTimer = Time;
 }
 
-bool UNinjaMovementComponent::SetAttackDashCooldownTimer_Validate(float Time) {
+bool UNinjaMovementComponent::Server_SetAttackDashCooldownTimer_Validate(float Time) {
 	return true;
 }
 
@@ -165,9 +166,13 @@ void UNinjaMovementComponent::DoDodge()
 
 void UNinjaMovementComponent::Dash()
 {
-	if (!bWantsToDash) {
+	if (!bWantsToDash && AttackDashCooldownTimer <= 0.f) {
 		bWantsToDash = true;
 		AttackDashCooldownTimer = AttackDashCooldown;
+
+		if (PawnOwner->Role == ROLE_AutonomousProxy) {
+			Server_SetAttackDashCooldownTimer(AttackDashCooldown);
+		}
 	}
 	
 }
@@ -244,7 +249,7 @@ void UNinjaMovementComponent::UpdateFromCompressedFlags(uint8 Flags)
 	Super::UpdateFromCompressedFlags(Flags);
 
 	bWantsToDodge = (Flags&FSavedMove_Character::FLAG_Custom_0) != 0;
-	bWantsToDash = (Flags&FSavedMove_Character::FLAG_Custom_0) != 0;
+	bWantsToDash = (Flags&FSavedMove_Character::FLAG_Custom_1) != 0;
 }
 
 void FSavedMove_Ninja::Clear()
@@ -267,8 +272,8 @@ uint8 FSavedMove_Ninja::GetCompressedFlags() const
 	if (bSavedWantsToDodge) {
 		Result |= FLAG_Custom_0;
 	}
-	else if (bSavedWantsToDash) {
-		Result |= FLAG_Custom_0;
+	if (bSavedWantsToDash) {
+		Result |= FLAG_Custom_1;
 	}
 
 	return Result;

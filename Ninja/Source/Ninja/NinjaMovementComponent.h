@@ -67,7 +67,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Ninja Attacking")
 		float AttackDashPower;
 
-	UFUNCTION(BlueprintCallable, Category="Test")
+	UFUNCTION()
 		void Dash();
 
 	UFUNCTION()
@@ -91,7 +91,7 @@ public:
 		bool GetWantsToDodge() const;
 
 	UFUNCTION(Server, Unreliable, WithValidation)
-		void SetAttackDashCooldownTimer(float Time);
+		void Server_SetAttackDashCooldownTimer(float Time);
 
 	virtual class FNetworkPredictionData_Client* GetPredictionData_Client() const override;
 
