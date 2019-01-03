@@ -119,6 +119,9 @@ protected:
 	UFUNCTION(Server, Reliable, WithValidation, Category = "Ninja Attacking")
 		void RegisterHit();
 
+	UFUNCTION(Server, Reliable, WithValidation, Category = "Ninja Attacking")
+		void Server_SetIsAttacking(bool Attacking);
+
 	UFUNCTION(NetMulticast, unreliable)
 		void SetWorldTime_Client(float scale);
 

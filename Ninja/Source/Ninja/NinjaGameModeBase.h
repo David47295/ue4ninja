@@ -46,6 +46,7 @@ public:
 	UFUNCTION()
 		void SetCurrentRound(int32 Round);
 
+	/*Allows you to set aspects of the game from Blueprints by ignoring the calls to retrieve aspects from GameInstance*/
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Debug")
 		bool Debug;
 private:

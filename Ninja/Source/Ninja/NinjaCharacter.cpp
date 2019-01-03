@@ -128,17 +128,19 @@ bool ANinjaCharacter::Server_HandleAnimations_Validate(float Dir)
 void ANinjaCharacter::Attack() {
 	UWorld* World = GetWorld();
 	if (World) {
-
-		bIsAttacking = true;
-		AttackAnimLength = AttackAnimFlipbook->GetTotalDuration();
-
 		UNinjaMovementComponent* CharMov = (UNinjaMovementComponent*)GetCharacterMovement();
 		if (CharMov) {
-			GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("AttackDashCooldownTimer = %f"),CharMov->AttackDashCooldownTimer));
-			CharMov->Dash();
-		}
+			if (CharMov->AttackDashCooldownTimer <= 0.f) {
+				Server_SetIsAttacking(true);
+				AttackAnimLength = AttackAnimFlipbook->GetTotalDuration();
 
-		World->GetTimerManager().SetTimer(AttackDashTimerHandle, this, &ANinjaCharacter::StopAttack , AttackAnimLength, false);
+				//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("AttackDashCooldownTimer = %f"),CharMov->AttackDashCooldownTimer));
+				CharMov->Dash();
+
+				World->GetTimerManager().SetTimer(AttackDashTimerHandle, this, &ANinjaCharacter::StopAttack, AttackAnimLength, false);
+			}
+		}
+		
 	}
 }
 
@@ -155,6 +157,16 @@ bool ANinjaCharacter::SetWorldTime_Server_Validate(float scale)
 
 void ANinjaCharacter::SetWorldTime_Client_Implementation(float scale) {
 	SetWorldTime(scale);
+}
+
+void ANinjaCharacter::Server_SetIsAttacking_Implementation(bool Attacking)
+{
+	bIsAttacking = Attacking;
+}
+
+bool ANinjaCharacter::Server_SetIsAttacking_Validate(bool Attacking)
+{
+	return true;
 }
 
 void ANinjaCharacter::SetWorldTime(float scale)
@@ -174,7 +186,7 @@ void ANinjaCharacter::StopAttack()
 	if (CharMov) {
 		CharMov->StopDash();
 		AttackHitbox->SetActive(false);
-		bIsAttacking = false;
+		Server_SetIsAttacking(false);
 	}
 	
 }
