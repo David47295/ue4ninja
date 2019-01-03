@@ -23,26 +23,29 @@ void UNinjaMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVecto
 	if (!PawnOwner) { return; }
 
 	if (PawnOwner->IsLocallyControlled()) {
-		MoveDirection = PawnOwner->GetLastMovementInputVector();
-		AirJumpDirection = MoveDirection * 600.f + FVector(0.f, 0.f, 500.f);
-		SetAirJumpDirection();
-		if (!bWantsToDash) {
-			SetAttackDashDirection(MoveDirection * AttackDashPower);
+		UWorld* World = GetWorld();
+		if (World) {
+			MoveDirection = PawnOwner->GetLastMovementInputVector();
+			AirJumpDirection = MoveDirection * 600.f + FVector(0.f, 0.f, 500.f);
+			SetAirJumpDirection();
 
-			UWorld* World = GetWorld();
-			if (World) {
-				AttackDashCooldownTimer -= World->GetDeltaSeconds();
+			if (!bWantsToDash) {
+				SetAttackDashDirection(MoveDirection * AttackDashPower);
+				
 			}
 
-		}
+			if (!bWantsToDodge) {
+				DodgeDirection = MoveDirection * DodgePower;
+				
+			}
 
-		if (!bWantsToDodge) {
-			DodgeDirection = MoveDirection * DodgePower;
-		}
+			if (bWantsToDodge) {
+				DodgeTimeline.TickTimeline(GetWorld()->GetDeltaSeconds());
+				DodgeTimelineValue = DodgeSpeedCurve->GetFloatValue(DodgeTimeline.GetPlaybackPosition());
+			}
 
-		if (bWantsToDodge) {
-			DodgeTimeline.TickTimeline(GetWorld()->GetDeltaSeconds());
-			DodgeTimelineValue = DodgeSpeedCurve->GetFloatValue(DodgeTimeline.GetPlaybackPosition());
+			AttackDashCooldownTimer -= World->GetDeltaSeconds();
+			DodgeCooldownTimer -= World->GetDeltaSeconds();
 		}
 	}
 
@@ -72,6 +75,7 @@ void UNinjaMovementComponent::ServerSetMoveDirection_Implementation(const FVecto
 	UWorld* World = GetWorld();
 	if (World) {
 		AttackDashCooldownTimer -= World->GetDeltaSeconds();
+		DodgeCooldownTimer -= World->GetDeltaSeconds();
 	}
 
 }
@@ -179,16 +183,19 @@ void UNinjaMovementComponent::Dash()
 
 void UNinjaMovementComponent::Dodge()
 {
-	bWantsToDodge = true;
 
-	FOnTimelineFloat TimelineCallback;
-	FOnTimelineEventStatic OnTimelineFinished;
-	OnTimelineFinished.BindUFunction(this, FName{ TEXT("StopDodge") });
+	if (!bWantsToDodge && DodgeCooldownTimer <= 0.f) {
+		bWantsToDodge = true;
+		DodgeCooldownTimer = DodgeCooldown;
 
-	DodgeTimeline.AddInterpFloat(DodgeSpeedCurve, NULL);
-	DodgeTimeline.SetTimelineFinishedFunc(OnTimelineFinished);
-	DodgeTimeline.PlayFromStart();
-	
+		FOnTimelineFloat TimelineCallback;
+		FOnTimelineEventStatic OnTimelineFinished;
+		OnTimelineFinished.BindUFunction(this, FName{ TEXT("StopDodge") });
+
+		DodgeTimeline.AddInterpFloat(DodgeSpeedCurve, NULL);
+		DodgeTimeline.SetTimelineFinishedFunc(OnTimelineFinished);
+		DodgeTimeline.PlayFromStart();
+	}
 }
 
 void UNinjaMovementComponent::StopDash()
@@ -296,6 +303,7 @@ void FSavedMove_Ninja::SetMoveFor(ACharacter * Character, float InDeltaTime, FVe
 		bSavedWantsToDash = CharMov->bWantsToDash;
 		SavedDodgeTimelineValue = CharMov->DodgeTimelineValue;
 		SavedAttackDashCooldownTimer = CharMov->AttackDashCooldownTimer;
+		SavedDodgeCooldownTimer = CharMov->DodgeCooldownTimer;
 	}
 }
 
@@ -310,6 +318,7 @@ void FSavedMove_Ninja::PrepMoveFor(ACharacter * Character)
 		CharMov->bWantsToDash = bSavedWantsToDash;
 		CharMov->DodgeTimelineValue = SavedDodgeTimelineValue;
 		CharMov->AttackDashCooldownTimer = SavedAttackDashCooldownTimer;
+		CharMov->DodgeCooldownTimer = SavedDodgeCooldownTimer;
 	}
 }
 

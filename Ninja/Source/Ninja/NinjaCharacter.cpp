@@ -206,11 +206,13 @@ void ANinjaCharacter::Dodge()
 	UWorld* World = GetWorld();
 	if (World) {
 		UNinjaMovementComponent * CharMov = (UNinjaMovementComponent*)GetCharacterMovement();
-		if (CharMov && !CharMov->bWantsToDodge) {
-			CharMov->Dodge();
-			bIsDodging = true;
-			if (Role == ROLE_AutonomousProxy) {
-				Server_SetIsDodging(true);
+		if (CharMov) {
+			if (!CharMov->bWantsToDodge && CharMov->DodgeCooldownTimer <= 0.f) {
+				CharMov->Dodge();
+				bIsDodging = true;
+				if (Role == ROLE_AutonomousProxy) {
+					Server_SetIsDodging(true);
+				}
 			}
 		}
 	}

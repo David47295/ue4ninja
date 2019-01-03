@@ -33,6 +33,12 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Ninja Attacking")
 		float AttackDashCooldownTimer;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ninja Dodge")
+		float DodgeCooldown;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Ninja Dodge")
+		float DodgeCooldownTimer;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		float DodgeTimelineValue;
 
@@ -123,6 +129,8 @@ public:
 	float SavedDodgeTimelineValue;
 
 	float SavedAttackDashCooldownTimer;
+	
+	float SavedDodgeCooldownTimer;
 
 	typedef FSavedMove_Character Super;
 
