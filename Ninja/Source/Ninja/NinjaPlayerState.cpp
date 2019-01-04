@@ -6,7 +6,7 @@
 void ANinjaPlayerState::SetChosenCharacter(TSubclassOf<ACharacter> Character)
 {
 	ChosenCharacter = Character;
-	if (Role == ROLE_AutonomousProxy) {
+	if (Role < ROLE_Authority) {
 		Server_SetChosenCharacter(Character);
 	}
 }

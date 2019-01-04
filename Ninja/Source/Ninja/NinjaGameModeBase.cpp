@@ -29,25 +29,34 @@ void ANinjaGameModeBase::BeginRound()
 	UWorld* World = GetWorld();
 	if (World) {
 		ClearPlayerStartTags();
-		for (TActorIterator<APlayerController> Itr(World); Itr; ++Itr) {
-			APlayerController* Cont = *Itr;
-			if (Cont) {
-				ACharacter* Character = Cont->GetCharacter();
-				APlayerStart* PS = (APlayerStart*)ChoosePlayerStart(Cont);
-				if (PS) {
-					PS->PlayerStartTag = FName(TEXT("Taken"));
-					if (Character) {
-						Character->Destroy();
-					}
-
-					FActorSpawnParameters Params;
-					Params.Owner = Cont;
-					ANinjaCharacter* SpawnedChar = World->SpawnActor<ANinjaCharacter>(BPNinjaCharacterClass, PS->GetActorLocation(), PS->GetActorRotation(), Params);
-					if (SpawnedChar) {
-						Cont->Possess(SpawnedChar);
-					}
+		for (APlayerState* CurrState : GameState->PlayerArray) {
+			ANinjaPlayerState* State = (ANinjaPlayerState*)CurrState;
+			if (State) {
+				APlayerController* Cont = (APlayerController*) State->GetOwner();
+				GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("%s"), *Cont->GetName()));
+				if (State->GetChosenCharacter()) {
+					GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, FString::Printf(TEXT("%s - %s"), *Cont->GetName(), *State->GetChosenCharacter()->GetName()));
 				}
+				
+				if (Cont) {
+					ACharacter* Character = Cont->GetCharacter();
+					APlayerStart* PS = (APlayerStart*)ChoosePlayerStart(Cont);
+					if (PS) {
+						PS->PlayerStartTag = FName(TEXT("Taken"));
+						if (Character) {
+							Character->Destroy();
+						}
 
+						FActorSpawnParameters Params;
+						Params.Owner = Cont;
+						ANinjaCharacter* SpawnedChar = World->SpawnActor<ANinjaCharacter>(State->GetChosenCharacter(), PS->GetActorLocation(), PS->GetActorRotation(), Params);
+						if (SpawnedChar) {
+							Cont->Possess(SpawnedChar);
+						}
+					}
+
+				}
+				
 			}
 		}
 	}
