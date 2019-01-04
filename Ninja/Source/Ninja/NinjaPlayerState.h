@@ -13,5 +13,17 @@ UCLASS()
 class NINJA_API ANinjaPlayerState : public APlayerState
 {
 	GENERATED_BODY()
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "NinjaCharacterSelect")
+		TSubclassOf<ACharacter> GetChosenCharacter() const;
+
+	UFUNCTION(BlueprintCallable, Category = "NinjaCharacterSelect")
+		void SetChosenCharacter(TSubclassOf<ACharacter> Character);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+		void Server_SetChosenCharacter(TSubclassOf<ACharacter> Character);
 	
+protected:
+	TSubclassOf<ACharacter> ChosenCharacter;
 };
