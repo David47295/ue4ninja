@@ -67,6 +67,21 @@ void ANinjaCharacter::BeginPlay()
 	Sprite->SetFlipbook(IdleAnimFlipbook);
 }
 
+void ANinjaCharacter::Server_PlayFlipbook_Implementation(UPaperFlipbook * Flipbook)
+{
+	PlayFlipbook(Flipbook);
+}
+
+bool ANinjaCharacter::Server_PlayFlipbook_Validate(UPaperFlipbook * Flipbook)
+{
+	return true;
+}
+
+void ANinjaCharacter::PlayFlipbook(UPaperFlipbook * Flipbook)
+{
+	Sprite->SetFlipbook(Flipbook);
+}
+
 bool ANinjaCharacter::IsFlipbookPlaying(UPaperFlipbook * Flipbook) const
 {
 	return Sprite->GetFlipbook() == Flipbook;
@@ -111,7 +126,7 @@ void ANinjaCharacter::Server_HandleAnimations_Implementation(float Dir)
 			if (Dir != 0.f && !IsFlipbookPlaying(JumpAnimFlipbook)) {
 				//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("Walking")));
 				Sprite->SetFlipbook(WalkAnimFlipbook);
-			} else if (Dir == 0.f) {
+			} else if (Dir == 0.f && !IsFlipbookPlaying(IdleAnimFlipbook)) {
 				Sprite->SetFlipbook(IdleAnimFlipbook);
 			}
 		}
@@ -130,12 +145,17 @@ void ANinjaCharacter::Attack() {
 	if (World) {
 		UNinjaMovementComponent* CharMov = (UNinjaMovementComponent*)GetCharacterMovement();
 		if (CharMov) {
-			if (CharMov->AttackDashCooldownTimer <= 0.f) {
+			if (!bIsAttacking && !bIsDodging && CharMov->AttackDashCooldownTimer <= 0.f) {
 				Server_SetIsAttacking(true);
 				AttackAnimLength = AttackAnimFlipbook->GetTotalDuration();
 
 				//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("AttackDashCooldownTimer = %f"),CharMov->AttackDashCooldownTimer));
 				CharMov->Dash();
+
+				PlayFlipbook(AttackAnimFlipbook);
+				if (Role == ROLE_AutonomousProxy) {
+					Server_PlayFlipbook(AttackAnimFlipbook);
+				}
 
 				World->GetTimerManager().SetTimer(AttackDashTimerHandle, this, &ANinjaCharacter::StopAttack, AttackAnimLength, false);
 			}
@@ -187,6 +207,11 @@ void ANinjaCharacter::StopAttack()
 		CharMov->StopDash();
 		AttackHitbox->SetActive(false);
 		Server_SetIsAttacking(false);
+
+		PlayFlipbook(IdleAnimFlipbook);
+		if (Role == ROLE_AutonomousProxy) {
+			Server_PlayFlipbook(IdleAnimFlipbook);
+		}
 	}
 	
 }

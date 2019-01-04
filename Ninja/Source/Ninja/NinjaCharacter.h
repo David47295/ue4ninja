@@ -156,6 +156,12 @@ protected:
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category = "Debug")
 		bool bIsAttacking;
 
+	UFUNCTION(Server, Unreliable, WithValidation)
+		void Server_PlayFlipbook(UPaperFlipbook* Flipbook);
+
+	UFUNCTION()
+		void PlayFlipbook(UPaperFlipbook* Flipbook);
+
 	UFUNCTION()
 		bool IsFlipbookPlaying(UPaperFlipbook* Flipbook) const;
 

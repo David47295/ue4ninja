@@ -170,7 +170,7 @@ void UNinjaMovementComponent::DoDodge()
 
 void UNinjaMovementComponent::Dash()
 {
-	if (!bWantsToDash && AttackDashCooldownTimer <= 0.f) {
+	if (!bWantsToDash && !bWantsToDodge) {
 		bWantsToDash = true;
 		AttackDashCooldownTimer = AttackDashCooldown;
 
@@ -178,13 +178,16 @@ void UNinjaMovementComponent::Dash()
 			Server_SetAttackDashCooldownTimer(AttackDashCooldown);
 		}
 	}
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("Can't Dash")));
+	}
 	
 }
 
 void UNinjaMovementComponent::Dodge()
 {
 
-	if (!bWantsToDodge && DodgeCooldownTimer <= 0.f) {
+	if (!bWantsToDodge && !bWantsToDash && DodgeCooldownTimer <= 0.f) {
 		bWantsToDodge = true;
 		DodgeCooldownTimer = DodgeCooldown;
 
