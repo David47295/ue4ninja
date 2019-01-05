@@ -25,5 +25,6 @@ public:
 		TSubclassOf<UUserWidget> ScoreBoardWidget;
 
 protected:
-
+	UFUNCTION(BlueprintCallable, Category="Ninja Lobby")
+		bool CanGameStart();
 };

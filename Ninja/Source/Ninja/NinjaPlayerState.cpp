@@ -13,7 +13,6 @@ void ANinjaPlayerState::SetChosenCharacter(TSubclassOf<ACharacter> Character)
 
 void ANinjaPlayerState::Server_SetChosenCharacter_Implementation(TSubclassOf<ACharacter> Character)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("Selected Character")));
 	SetChosenCharacter(Character);
 }
 
