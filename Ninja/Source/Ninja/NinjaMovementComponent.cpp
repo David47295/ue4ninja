@@ -26,7 +26,7 @@ void UNinjaMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVecto
 		UWorld* World = GetWorld();
 		if (World) {
 			MoveDirection = PawnOwner->GetLastMovementInputVector();
-			AirJumpDirection = MoveDirection * 600.f + FVector(0.f, 0.f, 500.f);
+			AirJumpDirection = MoveDirection * AirJumpPower + FVector(0.f, 0.f, AirJumpPower);
 			SetAirJumpDirection();
 
 			if (!bWantsToDash) {
@@ -62,7 +62,7 @@ void UNinjaMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVecto
 void UNinjaMovementComponent::ServerSetMoveDirection_Implementation(const FVector & Dir) {
 	MoveDirection = Dir;
 
-	AirJumpDirection = MoveDirection * 600.f + FVector(0.f, 0.f, 500.f);
+	AirJumpDirection = MoveDirection * AirJumpPower + FVector(0.f, 0.f, AirJumpPower);
 
 	if (!bWantsToDash) {
 		AttackDashDirection = MoveDirection * AttackDashPower;

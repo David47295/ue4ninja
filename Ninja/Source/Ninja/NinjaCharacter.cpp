@@ -126,7 +126,7 @@ void ANinjaCharacter::Server_HandleAnimations_Implementation(float Dir)
 			if (Dir != 0.f && !IsFlipbookPlaying(JumpAnimFlipbook)) {
 				//GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Blue, FString::Printf(TEXT("Walking")));
 				Sprite->SetFlipbook(WalkAnimFlipbook);
-			} else if (Dir == 0.f && !IsFlipbookPlaying(IdleAnimFlipbook)) {
+			} else if (Dir == 0.f && !IsFlipbookPlaying(JumpAnimFlipbook)) {
 				Sprite->SetFlipbook(IdleAnimFlipbook);
 			}
 		}

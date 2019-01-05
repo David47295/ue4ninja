@@ -27,6 +27,9 @@ public:
 
 	FVector AirJumpDirection;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ninja Jumping")
+		float AirJumpPower;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ninja Attacking")
 		float AttackDashCooldown;
 
